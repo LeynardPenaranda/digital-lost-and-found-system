@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/app/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import ReduxProvider from "@/providers/redux-provider";
+import "remixicon/fonts/remixicon.css";
 
 export const metadata: Metadata = {
   title: "Digital Lost and Found System",
@@ -15,7 +17,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>{children}</body>
+        <body>
+          <ReduxProvider>{children}</ReduxProvider>
+        </body>
       </html>
     </ClerkProvider>
   );

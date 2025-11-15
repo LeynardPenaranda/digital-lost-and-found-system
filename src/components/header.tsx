@@ -1,7 +1,78 @@
+"use client";
+
+import { GetCurrentUserFromMongoDB } from "@/server-actions/users";
+import { message } from "antd";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import NavLinks from "./navlinks";
+import CurrentUserInfo from "./current-user-info";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setCurrentUserData,
+  setOnlineUsers,
+  UserState,
+} from "@/redux/userSlice";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import socket from "@/config/socket-config";
+
 const Header = () => {
+  const [showCurrentUserInfo, setShowCurrentUserInfo] = useState(false);
+  const { currentUserData }: UserState = useSelector(
+    (state: any) => state.user
+  );
+  const dispatch = useDispatch();
+
+  const getCurrentUser = async () => {
+    try {
+      const response = await GetCurrentUserFromMongoDB();
+      if (response.error) throw new Error(response.error);
+      dispatch(setCurrentUserData(response));
+    } catch (error: any) {
+      message.error(error.message || "Something went wrong fetching user data");
+    }
+  };
+  useEffect(() => {
+    getCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    if (currentUserData) {
+      socket.emit("join", currentUserData?._id);
+
+      // This set the online users to the redux or user slice
+      socket.on("online-users-updated", (onlineUser: string[]) => {
+        dispatch(setOnlineUsers(onlineUser));
+      });
+    }
+  }, [currentUserData]);
+
   return (
-    <header className="border h-[4rem]">
-      <h1>Lost and Found System</h1>
+    <header className="border h-[5rem] flex items-center justify-between bg-gray-100">
+      <div className="flex items-center justify-center">
+        <Image src="/DLFS-logos.png" alt="Logo" width={70} height={70} />
+        <span className="uppercase font-bold">
+          Digital lost and found system
+        </span>
+      </div>
+      <div className="flex items-center gap-4 mr-5">
+        <div>
+          <NavLinks />
+        </div>
+        <Avatar
+          className="cursor-pointer"
+          onClick={() => setShowCurrentUserInfo(true)}
+        >
+          <AvatarImage src={currentUserData?.profilePicture} />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
+      </div>
+      {showCurrentUserInfo && currentUserData && (
+        <CurrentUserInfo
+          currentUserData={currentUserData}
+          setShowCurrentUserInfo={setShowCurrentUserInfo}
+          showCurrentUserInfo={showCurrentUserInfo}
+        />
+      )}
     </header>
   );
 };

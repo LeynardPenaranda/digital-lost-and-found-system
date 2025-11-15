@@ -1,11 +1,10 @@
-import Footer from "@/components/footer";
 import Header from "@/components/header";
-import { SignUp } from "@clerk/nextjs";
+import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
   return (
     <div className="flex items-center justify-center h-screen">
-      <SignUp />
+      <SignIn />
     </div>
   );
 }

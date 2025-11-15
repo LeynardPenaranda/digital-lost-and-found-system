@@ -1,34 +1,42 @@
+// middleware.ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// ✅ Define which routes are protected
-const isProtectedRoute = createRouteMatcher([
-  "/", // protect homepage
-  "/dashboard(.*)", // protect all /dashboard routes
-  "/chat(.*)", // protect chat routes
-  "/profile(.*)", // protect profile routes
-  "/user(.*)", // protect normal user routes
+// Routes that require authentication
+const protectedRoute = createRouteMatcher([
+  "/",
+  "/admin/:path*",
+  "/user-messages/:path*",
+  "/lost-items/:path*",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
-  // If route is protected and no user is logged in
-  if (isProtectedRoute(req) && !userId) {
+  // Skip sign-in & sign-up pages
+  if (
+    req.nextUrl.pathname.startsWith("/sign-in") ||
+    req.nextUrl.pathname.startsWith("/sign-up")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Redirect if user is not logged in
+  if (protectedRoute(req) && !userId) {
     const signInUrl = new URL("/sign-in", req.url);
     signInUrl.searchParams.set("redirect_url", req.url);
     return NextResponse.redirect(signInUrl);
   }
 
-  // Otherwise, allow the request
   return NextResponse.next();
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and static files
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+    "/",
+    "/profile/:path*",
+    "/admin/:path*",
+    "/user-messages/:path*",
+    "/lost-items/:path*",
+  ], // middleware only applies to these
 };
