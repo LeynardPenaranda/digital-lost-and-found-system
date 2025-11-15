@@ -112,10 +112,9 @@ const Messages = () => {
 
     let unreadMessages = 0;
     let chat = chats.find((chat) => chat._id === selectedChat?._id);
-    if (chat) {
-      unreadMessages = chat.unreadCounts[currentUserData?._id!] || 0;
+    if (chat && currentUserData?._id && chat.unreadCounts) {
+      unreadMessages = chat.unreadCounts[currentUserData._id] || 0;
     }
-
     if (unreadMessages > 0) {
       ReadAllMessages({
         userId: currentUserData?._id!,
