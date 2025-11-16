@@ -31,3 +31,14 @@ export interface MessageType {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface LostItemReportType {
+  _id: string;
+  reportedBy: UserType; // can be just userId string or populated User object
+  item: string;
+  location: string;
+  itemDescription: string;
+  lostItemsImages: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
