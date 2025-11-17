@@ -39,6 +39,7 @@ export interface LostItemReportType {
   location: string;
   itemDescription: string;
   lostItemsImages: string[];
+  lostItemStatus: "pending" | "found";
   createdAt: Date;
   updatedAt: Date;
 }

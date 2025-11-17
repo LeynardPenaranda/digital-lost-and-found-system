@@ -14,8 +14,12 @@ const navlinks = [
     href: "/found-items",
   },
   {
-    name: "messages",
+    name: "Messages",
     href: "/user-messages",
+  },
+  {
+    name: "Reported Items",
+    href: "/report-items",
   },
 ];
 

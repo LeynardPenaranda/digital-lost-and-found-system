@@ -10,15 +10,15 @@ const LostItemCarousel = ({ images = [] }: { images?: string[] }) => {
 
   if (!images || images.length === 0) return null;
 
-  const showButtons = images.length > 1; // only show buttons if more than 1 image
+  const showButtons = images.length > 1;
 
   return (
-    <div className="relative w-full h-40">
+    <div className="lost-item-carousel relative w-full h-40">
       <Carousel
         ref={carouselRef}
         autoplay
         dots
-        arrows={false} // hide default arrows
+        arrows={false}
         className="h-full"
       >
         {images.map((src, index) => (
@@ -33,7 +33,6 @@ const LostItemCarousel = ({ images = [] }: { images?: string[] }) => {
         ))}
       </Carousel>
 
-      {/* Custom Prev/Next buttons only if more than 1 image */}
       {showButtons && (
         <>
           <button
@@ -50,6 +49,30 @@ const LostItemCarousel = ({ images = [] }: { images?: string[] }) => {
           </button>
         </>
       )}
+
+      {/* Dot styling override */}
+      <style jsx global>{`
+        /* Dot wrapper (small pill) */
+        .lost-item-carousel .slick-dots {
+          background: rgba(0, 0, 0, 0.35); /* transparent black */
+          padding: 4px 12px;
+          border-radius: 9999px; /* fully rounded */
+          width: fit-content !important;
+          left: 50% !important;
+          transform: translateX(-50%); /* center the pill */
+          bottom: 6px !important;
+        }
+
+        /* Dot colors */
+        .lost-item-carousel .slick-dots li button {
+          background: white !important;
+        }
+
+        .lost-item-carousel .slick-dots li.slick-active button {
+          background: white !important;
+          width: 18px !important; /* small stretch */
+        }
+      `}</style>
     </div>
   );
 };

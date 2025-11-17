@@ -23,6 +23,11 @@ const lostItemsSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    lostItemStatus: {
+      type: String,
+      enum: ["pending", "found"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );

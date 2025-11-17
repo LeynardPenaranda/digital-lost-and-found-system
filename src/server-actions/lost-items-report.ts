@@ -30,11 +30,33 @@ export const createLostItemReport = async (payload: {
   }
 };
 
-export const getAllLostItems = async (searchQuery?: string) => {
+// export const getAllLostItems = async (searchQuery?: string) => {
+//   try {
+//     const filter = searchQuery
+//       ? { item: { $regex: searchQuery, $options: "i" } } // case-insensitive search
+//       : {};
+
+//     const lostItems = await LostItemModel.find(filter)
+//       .populate("reportedBy")
+//       .sort({ createdAt: -1 });
+
+//     return JSON.parse(JSON.stringify(lostItems));
+//   } catch (error: any) {
+//     return { message: error.message, error: true };
+//   }
+// };
+
+export const getAllLostItems = async (searchQuery = "", status?: string) => {
   try {
-    const filter = searchQuery
-      ? { item: { $regex: searchQuery, $options: "i" } } // case-insensitive search
-      : {};
+    let filter: any = {};
+
+    if (searchQuery) {
+      filter.item = { $regex: searchQuery, $options: "i" };
+    }
+
+    if (status) {
+      filter.lostItemStatus = status;
+    }
 
     const lostItems = await LostItemModel.find(filter)
       .populate("reportedBy")
@@ -42,6 +64,8 @@ export const getAllLostItems = async (searchQuery?: string) => {
 
     return JSON.parse(JSON.stringify(lostItems));
   } catch (error: any) {
-    return { message: error.message, error: true };
+    return {
+      error: error.message,
+    };
   }
 };
