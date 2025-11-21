@@ -6,23 +6,24 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { LostItemReportType } from "@/interfaces";
+import { FoundItemReportType } from "@/interfaces";
 import dayjs from "dayjs";
-import LostItemCarousel from "./lost-item-carousel";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BadgeX, CircleCheck } from "lucide-react";
-import { UserState } from "@/redux/userSlice";
+import { CircleCheck, SearchCheck } from "lucide-react";
+import FoundItemCarousel from "./found-item-carousel";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { UserState } from "@/redux/userSlice";
 import { GetOrCreateChat, SendMessage } from "@/server-actions/chats";
 import { SetSelectedChat } from "@/redux/chatSlice";
 import { message } from "antd";
-import { useRouter } from "next/navigation";
 
-const LostItemCard = ({ items }: { items: LostItemReportType }) => {
+const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
   const [showMore, setShowMore] = useState(false);
 
   const descriptionTooLong = items.itemDescription.length > 155;
+
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -48,11 +49,11 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
       text: [
         `Item name: ${items.item}`,
         `Location: ${items.location}`,
-        `Current Status: Lost ${items.lostItemStatus}`,
+        `Current Status: Lost ${items.foundItemStatus}`,
       ].join("\n"),
 
       // 👇 Store the FIRST lost item image properly here
-      image: items.lostItemsImages?.[0] || "",
+      image: items.foundItemsImages?.[0] || "",
     });
 
     // Set chat in Redux
@@ -62,12 +63,12 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
     router.push("/user-messages");
   };
 
-  if (items.lostItemStatus === "pending") {
+  if (items.foundItemStatus === "pending") {
     return (
       <Card className="h-[30rem] w-[80%] sm:w-[18rem] md:w-[20rem]">
-        <div className="w-full bg-red-200 flex gap-2 items-center justify-center py-2 rounded-t-sm">
-          <span className="text-red-500 font-semibold">Missing</span>
-          <BadgeX className="text-red-500" />
+        <div className="w-full bg-yellow-200/40 flex gap-2 items-center justify-center py-2 rounded-t-sm">
+          <span className="text-yellow-500 font-semibold">Found Item</span>
+          <SearchCheck className="text-yellow-500" />
         </div>
         <CardHeader className="py-2 px-1">
           <div className="flex gap-2">
@@ -88,14 +89,14 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
         </CardHeader>
         <CardContent className="p-0 m-0 flex-1">
           <div>
-            <LostItemCarousel item={items} />
+            <FoundItemCarousel item={items} />
           </div>
         </CardContent>
         <CardFooter className="px-2 py-0 m-0 flex flex-col gap-2 h-[45%] w-full ">
           {/* Lost Item & Location fixed at top */}
           <div className="flex flex-col gap-1 w-full">
             <div className="flex gap-2 text-xs">
-              <span className="text-gray-500">Lost Item Name:</span>
+              <span className="text-gray-500">Found Item Name:</span>
               <span>{items.item}</span>
             </div>
             <div className="flex gap-2 text-xs">
@@ -147,7 +148,9 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
     return (
       <Card className="h-[30rem] w-[80%] sm:w-[18rem] md:w-[20rem]">
         <div className="w-full bg-green-200 flex gap-2 items-center justify-center py-2 rounded-t-sm">
-          <span className="text-green-500 font-semibold">Found item</span>
+          <span className="text-green-500 font-semibold">
+            Claimed Found item
+          </span>
           <CircleCheck className="text-green-500" />
         </div>
         <CardHeader className="py-2 px-1">
@@ -169,14 +172,14 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
         </CardHeader>
         <CardContent className="p-0 m-0 flex-1">
           <div>
-            <LostItemCarousel item={items} />
+            <FoundItemCarousel item={items} />
           </div>
         </CardContent>
         <CardFooter className="px-2 py-0 m-0 flex flex-col gap-2 h-[45%] w-full ">
           {/* Lost Item & Location fixed at top */}
           <div className="flex flex-col gap-1 w-full">
             <div className="flex gap-2 text-xs">
-              <span className="text-gray-500">Lost Item Name:</span>
+              <span className="text-gray-500">Found Item Name:</span>
               <span>{items.item}</span>
             </div>
             <div className="flex gap-2 text-xs">
@@ -227,4 +230,4 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
   }
 };
 
-export default LostItemCard;
+export default FoundItemCard;

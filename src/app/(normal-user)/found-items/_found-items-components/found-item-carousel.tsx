@@ -4,13 +4,13 @@ import React, { useRef } from "react";
 import { Carousel } from "antd";
 import Image from "next/image";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-import { LostItemReportType } from "@/interfaces";
+import { FoundItemReportType } from "@/interfaces";
 import { CircleCheck } from "lucide-react";
 
-const LostItemCarousel = ({ item }: { item: LostItemReportType }) => {
+const FoundItemCarousel = ({ item }: { item: FoundItemReportType }) => {
   const carouselRef = useRef<any>(null);
 
-  const images = item?.lostItemsImages || [];
+  const images = item?.foundItemsImages || [];
 
   if (images.length === 0) return null;
 
@@ -28,10 +28,10 @@ const LostItemCarousel = ({ item }: { item: LostItemReportType }) => {
         {images.map((src, index) => (
           <div key={index} className="relative w-full h-40">
             {/* Found Overlay */}
-            {item.lostItemStatus === "found" && (
+            {item.foundItemStatus === "claimed" && (
               <div className="absolute inset-0 z-20 flex items-center justify-center">
-                <span className="text-green-400 text-3xl font-bold px-5 py-2 rounded-md bg-green-200/40 border-2 border-green-500 flex items-center justify-center">
-                  Item Found
+                <span className="text-green-400 text-2xl font-bold px-5 py-2 rounded-md bg-green-200/40 border-2 border-green-500 flex items-center justify-center">
+                  Item Found Claimed
                   <CircleCheck className="text-green-500" />
                 </span>
               </div>
@@ -89,4 +89,4 @@ const LostItemCarousel = ({ item }: { item: LostItemReportType }) => {
   );
 };
 
-export default LostItemCarousel;
+export default FoundItemCarousel;

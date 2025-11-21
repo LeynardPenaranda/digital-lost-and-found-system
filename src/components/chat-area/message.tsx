@@ -22,23 +22,24 @@ const Message = ({ message }: { message: MessageType }) => {
   }
   if (isLoggedInUserMessage) {
     return (
-      <div className="flex justify-end gap-2">
-        <div>
-          {message.text && (
-            <p className="bg-primary text-white py-2 px-5 rounded-xl rounded-tr-none">
-              {message.text}
-            </p>
-          )}
-          {message.image && (
-            <div className="bg-primary py-2 px-5 rounded-xl rounded-tr-none">
+      <div className="flex justify-end gap-2 ">
+        <div className="max-w-[320px] w-fit">
+          <div className="bg-primary text-white p-3 rounded-xl rounded-tr-none max-w-[250px] space-y-2">
+            {message.text && (
+              <p className="whitespace-pre-line break-words">{message.text}</p>
+            )}
+
+            {message.image && (
               <Image
                 src={message.image}
                 alt="chat-image"
                 width={190}
                 height={190}
+                className="rounded-md"
               />
-            </div>
-          )}
+            )}
+          </div>
+
           <div className="flex justify-between gap-5">
             <span className="text-[13px] text-gray-400 flex">
               {formatDateTime(message.createdAt)}
@@ -67,7 +68,7 @@ const Message = ({ message }: { message: MessageType }) => {
           <AvatarImage src={message.sender.profilePicture} />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
-        <div>
+        <div className="max-w-[320px] w-fit">
           <span className="text-blue-500 text-sm">{message.sender.name}</span>
 
           {message.text && (

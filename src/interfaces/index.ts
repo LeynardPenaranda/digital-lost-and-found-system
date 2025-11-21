@@ -43,3 +43,14 @@ export interface LostItemReportType {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface FoundItemReportType {
+  _id: string;
+  reportedBy: UserType; // can be just userId string or populated User object
+  item: string;
+  location: string;
+  itemDescription: string;
+  foundItemsImages: string[];
+  foundItemStatus: "pending" | "claimed";
+  createdAt: Date;
+  updatedAt: Date;
+}

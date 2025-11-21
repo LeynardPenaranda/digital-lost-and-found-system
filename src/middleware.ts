@@ -8,6 +8,8 @@ const protectedRoute = createRouteMatcher([
   "/admin/:path*",
   "/user-messages/:path*",
   "/lost-items/:path*",
+  "/found-items/:path*",
+  "/report-items/:path*",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -38,5 +40,7 @@ export const config = {
     "/admin/:path*",
     "/user-messages/:path*",
     "/lost-items/:path*",
+    "/found-items/:path*",
+    "/report-items/:path*",
   ], // middleware only applies to these
 };

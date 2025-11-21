@@ -3,53 +3,53 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { message, Spin } from "antd";
-import { LostItemReportType } from "@/interfaces";
-import { getAllLostItems } from "@/server-actions/lost-items-report";
-import LostItemCard from "./lost-item-card";
+import { FoundItemReportType } from "@/interfaces";
 import socket from "@/config/socket-config";
+import { getAllFoundItems } from "@/server-actions/found-items-report";
+import FoundItemCard from "./found-item-card";
 
-const LostItemsContent = () => {
+const FoundItemsContent = () => {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
 
-  const [lostItems, setLostItems] = useState<LostItemReportType[]>([]);
+  const [foundItems, setFoundItems] = useState<FoundItemReportType[]>([]);
   const [loading, setLoading] = useState(false);
 
   // NEW: state for switching tabs
-  const [statusFilter, setStatusFilter] = useState<"pending" | "found">(
+  const [statusFilter, setStatusFilter] = useState<"pending" | "claimed">(
     "pending"
   );
 
-  const fetchLostItems = async () => {
+  const fetchFoundItems = async () => {
     try {
       setLoading(true);
 
-      const response = await getAllLostItems(searchQuery, statusFilter);
+      const response = await getAllFoundItems(searchQuery, statusFilter);
 
       if ("error" in response) throw new Error(response.error);
-
-      setLostItems(response);
+      console.log(response);
+      setFoundItems(response);
     } catch (error: any) {
-      message.error("Failed to get the lost items report");
+      message.error("Failed to get the found items report");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchLostItems();
+    fetchFoundItems();
   }, [searchQuery, statusFilter]); // Re-fetch when search or tab changes
 
   useEffect(() => {
-    socket.on("lost-item-created", (newReport) => {
+    socket.on("found-item-created", (newReport: FoundItemReportType) => {
       // Only add report if it matches current tab (pending/found)
-      if (newReport.lostItemStatus === statusFilter) {
-        setLostItems((prev) => [newReport, ...prev]);
+      if (newReport.foundItemStatus === statusFilter) {
+        setFoundItems((prev) => [newReport, ...prev]);
       }
     });
 
     return () => {
-      socket.off("lost-item-created");
+      socket.off("found-item-created");
     };
   }, [statusFilter]);
 
@@ -69,11 +69,11 @@ const LostItemsContent = () => {
 
           <div
             className={`cursor-pointer ${
-              statusFilter === "found" ? "border-b-4 border-blue-950" : ""
+              statusFilter === "claimed" ? "border-b-4 border-blue-950" : ""
             }`}
-            onClick={() => setStatusFilter("found")}
+            onClick={() => setStatusFilter("claimed")}
           >
-            Report Found
+            Report Claimed
           </div>
         </div>
       </div>
@@ -81,15 +81,15 @@ const LostItemsContent = () => {
       {/* CONTENT SECTION */}
       <div className="w-full h-[40rem] overflow-y-auto mt-5">
         {loading && <Spin size="large" className="my-10 flex justify-center" />}
-        {lostItems.length === 0 && !loading && (
+        {foundItems.length === 0 && !loading && (
           <span className="text-[2rem] text-gray-400 font-semibold my-10 flex justify-center">
-            No {statusFilter} lost items...
+            No {statusFilter} found items...
           </span>
         )}
         {!loading && (
           <div className="flex gap-10 flex-wrap justify-center">
-            {lostItems.map((items) => (
-              <LostItemCard key={items._id} items={items} />
+            {foundItems.map((items) => (
+              <FoundItemCard key={items._id} items={items} />
             ))}
           </div>
         )}
@@ -98,4 +98,4 @@ const LostItemsContent = () => {
   );
 };
 
-export default LostItemsContent;
+export default FoundItemsContent;

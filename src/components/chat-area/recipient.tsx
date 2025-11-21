@@ -1,11 +1,12 @@
-import { ChatState } from "@/redux/chatSlice";
+import { ChatState, SetSelectedChat } from "@/redux/chatSlice";
 import { UserState } from "@/redux/userSlice";
 import Image from "next/image";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useEffect, useState } from "react";
 import socket from "@/config/socket-config";
 import { ChatType } from "@/interfaces";
+import { Button } from "antd";
 
 const Recipient = () => {
   const [typing, setTyping] = useState(false);
@@ -13,6 +14,8 @@ const Recipient = () => {
   const { currentUserData, onlineUsers }: UserState = useSelector(
     (state: any) => state.user
   );
+
+  const dispatch = useDispatch();
   let chatName = "";
   let chatImage = "";
 
@@ -23,6 +26,9 @@ const Recipient = () => {
   chatName = recipient?.name!;
   chatImage = recipient?.profilePicture!;
 
+  const unSelect = () => {
+    dispatch(SetSelectedChat(null));
+  };
   const onlineIndicator = () => {
     const recipientId = recipient?._id;
     const isOnline = onlineUsers.includes(recipientId!);
@@ -57,7 +63,7 @@ const Recipient = () => {
     };
   }, [selectedChat]);
   return (
-    <div className="flex justify-between py-2 px-5 border-b border-gray-200">
+    <div className="flex justify-between py-2 px-5 border-b border-gray-200 items-center">
       <div className="flex gap-5 items-center">
         <Avatar>
           <AvatarImage src={chatImage} />
@@ -76,6 +82,10 @@ const Recipient = () => {
           )}
           {typingAnimation()}
         </div>
+      </div>
+
+      <div>
+        <Button onClick={unSelect}>Close</Button>
       </div>
     </div>
   );

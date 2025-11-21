@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CreateNewChat } from "@/server-actions/chats";
 import { UserState } from "@/redux/userSlice";
 import { ChatState, SetChats } from "@/redux/chatSlice";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const NewChatModal = ({
   showNewChatModal,
@@ -105,13 +106,10 @@ const NewChatModal = ({
                       className="flex justify-between items-center"
                     >
                       <div className="flex gap-5 items-center">
-                        <Image
-                          src={user.profilePicture}
-                          alt="Profile"
-                          width={30}
-                          height={30}
-                          className="rounded-full"
-                        />
+                        <Avatar>
+                          <AvatarImage src={user.profilePicture} />
+                          <AvatarFallback>U</AvatarFallback>
+                        </Avatar>
                         <span className="text-gray-500 capitalize">
                           {user.name}
                         </span>
@@ -153,13 +151,10 @@ const NewChatModal = ({
                     <React.Fragment key={user._id}>
                       <div className="flex justify-between items-center">
                         <div className="flex gap-5 items-center">
-                          <Image
-                            src={user.profilePicture}
-                            alt="Profile"
-                            width={30}
-                            height={30}
-                            className="rounded-full"
-                          />
+                          <Avatar>
+                            <AvatarImage src={user.profilePicture} />
+                            <AvatarFallback>U</AvatarFallback>
+                          </Avatar>
                           <span className="text-gray-500 capitalize">
                             {user.name}
                           </span>

@@ -1,13 +1,16 @@
 import socket from "@/config/socket-config";
-import { UploadMultipleLostItemImagesAndreturnURL } from "@/lib/image-upload";
+import {
+  UploadMultipleFoundItemImagesAndreturnURL,
+  UploadMultipleLostItemImagesAndreturnURL,
+} from "@/lib/image-upload";
 import { UserState } from "@/redux/userSlice";
-
+import { createFoundItemReport } from "@/server-actions/found-items-report";
 import { createLostItemReport } from "@/server-actions/lost-items-report";
 import { Form, Input, Modal, Upload, message } from "antd";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
-const LostItemModal = ({
+const FoundItemModal = ({
   onOpenModal,
   setOnOpenModal,
 }: {
@@ -46,20 +49,20 @@ const LostItemModal = ({
       // Upload images if any
       let uploadedImages: string[] = [];
       if (files.length > 0) {
-        uploadedImages = await UploadMultipleLostItemImagesAndreturnURL(files);
+        uploadedImages = await UploadMultipleFoundItemImagesAndreturnURL(files);
       }
 
       // Create report
-      const response = await createLostItemReport({
+      const response = await createFoundItemReport({
         reportedBy: currentUserData?._id!,
         item: values.item,
         location: values.location,
         itemDescription: values.itemDescription,
-        lostItemsImages: uploadedImages,
+        foundItemsImages: uploadedImages,
       });
 
       if (response.success) {
-        socket.emit("lost-item-created", response.report);
+        socket.emit("found-item-created", response.report);
       }
 
       if (!response.success) {
@@ -67,7 +70,7 @@ const LostItemModal = ({
         return;
       }
 
-      message.success("Lost item report uploaded.");
+      message.success("Found item report uploaded.");
       form.resetFields();
       setFileList([]);
       setOnOpenModal(false);
@@ -83,7 +86,7 @@ const LostItemModal = ({
       centered
       open={onOpenModal}
       onCancel={() => setOnOpenModal(false)}
-      title="REPORT LOST ITEM"
+      title="REPORT FOUND ITEM"
       okText="Upload"
       onOk={onSend}
       confirmLoading={loading}
@@ -116,8 +119,8 @@ const LostItemModal = ({
         </Form.Item>
 
         <Form.Item
-          name="lostItemsImages"
-          label="Lost Item Images"
+          name="foundItemsImages"
+          label="Found Item Images"
           rules={[
             {
               validator: (_, value) => {
@@ -142,7 +145,7 @@ const LostItemModal = ({
             }}
           >
             <span className="p-5 text-xs text-gray-500">
-              Click here to select lost item images
+              Click here to select found item images
             </span>
           </Upload>
         </Form.Item>
@@ -151,4 +154,4 @@ const LostItemModal = ({
   );
 };
 
-export default LostItemModal;
+export default FoundItemModal;
