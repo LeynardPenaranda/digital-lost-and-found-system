@@ -41,17 +41,26 @@ const NewChatModal = ({
   };
 
   const onAddToChat = async (userId: string) => {
+    setSelectedUserId(userId);
+    setLoading(true);
     try {
-      setSelectedUserId(userId);
-      setLoading(true);
       const response = await CreateNewChat({
         users: [userId, currentUserData?._id],
         createdBy: currentUserData?._id,
       });
 
       if (response.error) throw new Error(response.error);
+
+      // Find the full user object from your users state
+      const addedUser = users.find((u) => u._id === userId);
+
+      const newChat = {
+        ...response,
+        users: [currentUserData, addedUser], // add current user and the added user
+      };
+
+      dispatch(SetChats([newChat, ...chats]));
       message.success("Chat added successfully");
-      dispatch(SetChats(response));
       setShowNewChatModal(false);
     } catch (error: any) {
       message.error(error.message);

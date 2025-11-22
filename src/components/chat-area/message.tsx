@@ -13,13 +13,13 @@ const Message = ({ message }: { message: MessageType }) => {
   );
   const { selectedChat }: ChatState = useSelector((state: any) => state.chat);
   const isLoggedInUserMessage = message.sender._id === currentUserData?._id;
-  let read = false;
-  if (
-    selectedChat &&
-    selectedChat?.users?.length - 1 === message.readBy.length
-  ) {
-    read = true;
-  }
+
+  const otherUsers =
+    selectedChat?.users.filter((user) => user._id !== message.sender._id) || [];
+
+  // message is considered read if ALL other users already read it
+  const read = otherUsers?.every((u) => message.readBy.includes(u._id));
+
   if (isLoggedInUserMessage) {
     return (
       <div className="flex justify-end gap-2 ">

@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import ReduxProvider from "@/providers/redux-provider";
 import "remixicon/fonts/remixicon.css";
+import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "Digital Lost and Found System",
@@ -18,7 +19,9 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          <ReduxProvider>{children}</ReduxProvider>
+          <ReduxProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </ReduxProvider>
         </body>
       </html>
     </ClerkProvider>

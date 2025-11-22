@@ -32,7 +32,7 @@ const ChatCard = ({ chat }: { chat: ChatType }) => {
     lastMessageSenderName =
       chat.lastMessage.sender?._id === currentUserData?._id
         ? "You: "
-        : `${chat.lastMessage.sender.name.split(" ")[0]}: `;
+        : `${chat.lastMessage?.sender?.name.split(" ")[0]}: `;
 
     lastMessageTime = formatDateTime(chat.lastMessage.createdAt);
   }

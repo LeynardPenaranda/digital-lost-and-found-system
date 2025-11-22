@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import socket from "@/config/socket-config";
 import { List } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const [showCurrentUserInfo, setShowCurrentUserInfo] = useState(false);
@@ -22,6 +23,7 @@ const Header = () => {
   const { currentUserData }: UserState = useSelector(
     (state: any) => state.user
   );
+  const pathname = usePathname();
   const dispatch = useDispatch();
 
   const getCurrentUser = async () => {
@@ -48,10 +50,17 @@ const Header = () => {
     }
   }, [currentUserData]);
 
+  useEffect(() => {
+    // Close drawer whenever route changes
+    setShowBar(false);
+  }, [pathname]);
+
   return (
     <header className="border h-[5rem] flex items-center justify-between bg-gray-100 sticky top-0 z-50">
       <div className="flex items-center justify-center">
-        <Image src="/DLFS-logos.png" alt="Logo" width={70} height={70} />
+        <div className="px-5">
+          <Image src="/DLFS-logos.png" alt="Logo" width={70} height={70} />
+        </div>
         <span className="uppercase font-bold hidden">
           Digital lost and found system
         </span>

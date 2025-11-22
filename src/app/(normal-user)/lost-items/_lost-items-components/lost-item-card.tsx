@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 
 const LostItemCard = ({ items }: { items: LostItemReportType }) => {
   const [showMore, setShowMore] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const descriptionTooLong = items.itemDescription.length > 155;
   const dispatch = useDispatch();
   const router = useRouter();
@@ -33,33 +33,39 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
   const openChat = async () => {
     if (!currentUserData?._id) return;
 
-    // Get or create chat
-    const chat = await GetOrCreateChat(
-      currentUserData._id,
-      items.reportedBy._id
-    );
+    try {
+      setLoading(true); // show loader
 
-    if (chat.error) return message.error(chat.error);
+      const chat = await GetOrCreateChat(
+        currentUserData._id,
+        items.reportedBy._id
+      );
 
-    // Auto-send item details message
-    await SendMessage({
-      chatId: chat._id,
-      sender: currentUserData._id,
-      text: [
-        `Item name: ${items.item}`,
-        `Location: ${items.location}`,
-        `Current Status: Lost ${items.lostItemStatus}`,
-      ].join("\n"),
+      if (chat.error) {
+        setLoading(false);
+        return message.error(chat.error);
+      }
 
-      // 👇 Store the FIRST lost item image properly here
-      image: items.lostItemsImages?.[0] || "",
-    });
+      // Send initial message
+      await SendMessage({
+        chatId: chat._id,
+        sender: currentUserData._id,
+        text: [
+          `Item name: ${items.item}`,
+          `Location: ${items.location}`,
+          `Current Status: Lost ${items.lostItemStatus}`,
+        ].join("\n"),
+        image: items.lostItemsImages?.[0] || "",
+      });
 
-    // Set chat in Redux
-    dispatch(SetSelectedChat(chat));
+      dispatch(SetSelectedChat(chat));
 
-    // Navigate to chat page
-    router.push("/user-messages");
+      // Navigate to chat page
+      router.push("/user-messages");
+    } finally {
+      // Let Next.js finish navigation then hide loader
+      setTimeout(() => setLoading(false), 300);
+    }
   };
 
   if (items.lostItemStatus === "pending") {
@@ -138,6 +144,15 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
               <Button className="w-full" onClick={openChat}>
                 Contact
               </Button>
+            )}
+
+            {loading && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+                <div className="h-12 w-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
+                <span className="text-white text-sm font-medium tracking-wide animate-pulse">
+                  Connecting...
+                </span>
+              </div>
             )}
           </div>
         </CardFooter>
@@ -219,6 +234,14 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
               <Button className="w-full" onClick={openChat}>
                 Contact
               </Button>
+            )}
+            {loading && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+                <div className="h-12 w-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
+                <span className="text-white text-sm font-medium tracking-wide animate-pulse">
+                  Connecting...
+                </span>
+              </div>
             )}
           </div>
         </CardFooter>

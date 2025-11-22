@@ -22,7 +22,7 @@ const ChatArea = () => {
   }
   return (
     selectedChat && (
-      <div className="flex-1 h-full flex flex-col justify-between">
+      <div className="flex-1 h-full lg:max-h-[91vh] flex flex-col justify-between">
         <Recipient />
         <Messages />
         <NewMessages />
