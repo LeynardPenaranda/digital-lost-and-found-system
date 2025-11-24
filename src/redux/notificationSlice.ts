@@ -1,44 +1,52 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface NotificationState {
-  notifications: { chatId: string; senderName: string; message: string }[];
-  unseenCount: number;
+  chatUnread: {
+    [chatId: string]: {
+      count: number;
+      lastMessage: string;
+      lastSenderName: string;
+    };
+  };
 }
 
 const initialState: NotificationState = {
-  notifications: [],
-  unseenCount: 0,
+  chatUnread: {},
 };
 
 const notificationSlice = createSlice({
   name: "notifications",
   initialState,
   reducers: {
-    addNotification: (
+    incrementUnread: (
       state,
       action: PayloadAction<{
         chatId: string;
-        senderName: string;
-        message: string;
+        lastMessage: string;
+        lastSenderName: string;
       }>
     ) => {
-      state.notifications.push(action.payload);
-      state.unseenCount += 1;
+      const { chatId, lastMessage, lastSenderName } = action.payload;
+      if (!state.chatUnread[chatId]) {
+        state.chatUnread[chatId] = {
+          count: 0,
+          lastMessage: "",
+          lastSenderName: "",
+        };
+      }
+      state.chatUnread[chatId].count += 1;
+      state.chatUnread[chatId].lastMessage = lastMessage;
+      state.chatUnread[chatId].lastSenderName = lastSenderName;
     },
-    clearNotifications: (state, action: PayloadAction<string>) => {
-      // remove notifications for a specific chat
-      state.notifications = state.notifications.filter(
-        (n) => n.chatId !== action.payload
-      );
-      state.unseenCount = state.notifications.length;
+    clearChatUnread: (state, action: PayloadAction<string>) => {
+      delete state.chatUnread[action.payload];
     },
-    clearAllNotifications: (state) => {
-      state.notifications = [];
-      state.unseenCount = 0;
+    clearAllUnread: (state) => {
+      state.chatUnread = {};
     },
   },
 });
 
-export const { addNotification, clearNotifications, clearAllNotifications } =
+export const { incrementUnread, clearChatUnread, clearAllUnread } =
   notificationSlice.actions;
 export default notificationSlice;

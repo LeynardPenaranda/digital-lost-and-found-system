@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const navlinks = [
   { name: "Home", href: "/" },
@@ -15,6 +16,8 @@ const NavLinks = ({ className }: { className?: string }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  const { chatUnread } = useSelector((state: any) => state.notifications);
 
   const handleNavigate = (href: string) => {
     setLoading(true);

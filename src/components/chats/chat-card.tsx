@@ -5,6 +5,7 @@ import { UserState } from "@/redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { formatDateTime } from "@/lib/date-formats";
+import { clearChatUnread } from "@/redux/notificationSlice";
 
 const ChatCard = ({ chat }: { chat: ChatType }) => {
   const { currentUserData, onlineUsers }: UserState = useSelector(
@@ -76,7 +77,10 @@ const ChatCard = ({ chat }: { chat: ChatType }) => {
       className={`flex justify-between hover:bg-gray-100 p-2 rounded cursor-pointer ${
         isSelected ? `bg-gray-100 border border-gray-200 ` : ``
       }`}
-      onClick={() => dispatch(SetSelectedChat(chat))}
+      onClick={() => {
+        dispatch(SetSelectedChat(chat)); // select the chat
+        dispatch(clearChatUnread(chat._id)); // clear unread count for this chat
+      }}
     >
       <div className="flex gap-5 items-center">
         <Avatar>

@@ -88,3 +88,36 @@ export const SendMessage = async ({ chatId, sender, text, image }: any) => {
     return { error: error.message };
   }
 };
+
+export const GetUserUnreadCounts = async (userId: string) => {
+  try {
+    // Find all chats where this user participates
+    const chats = await ChatModel.find({ users: userId }).populate({
+      path: "lastMessage",
+      populate: { path: "sender", select: "name" },
+    });
+
+    const chatUnread: {
+      [chatId: string]: {
+        count: number;
+        lastMessage: string;
+        lastSenderName: string;
+      };
+    } = {};
+
+    chats.forEach((chat) => {
+      const count = chat.unreadCounts?.[userId] || 0;
+      if (count > 0) {
+        chatUnread[chat._id.toString()] = {
+          count,
+          lastMessage: chat.lastMessage?.text || "",
+          lastSenderName: chat.lastMessage?.sender?.name || "",
+        };
+      }
+    });
+
+    return chatUnread;
+  } catch (error: any) {
+    return { error: error.message };
+  }
+};
