@@ -98,7 +98,7 @@ const Sidebar = () => {
       )}
 
       <div
-        className={`border border-l border-gray-300 p-4 flex flex-col gap-10 items-center relative ${
+        className={`border border-l border-gray-300 p-4 hidden lg:flex flex-col gap-10 items-center relative h-full ${
           isOpen ? "w-[17rem]" : "w-16"
         } transition-width duration-300`}
       >
@@ -214,6 +214,106 @@ const Sidebar = () => {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      <div
+        className={`border border-l border-gray-300 p-4 lg:hidden  flex-col gap-10 items-center relative h-full
+    transition-all duration-300 ease-in-out
+    ${isOpen ? "w-16 flex" : "hidden pointer-events-none"}
+  `}
+      >
+        {/* Logo */}
+        <div>
+          <Image src="/DLFS-logos.png" alt="Logo" width={90} height={90} />
+        </div>
+
+        {/* Navigation */}
+        <div className="flex flex-col gap-6 mt-20">
+          <Link
+            href="/admin"
+            onClick={() => setLoading(true)}
+            className={`flex gap-8 items-center px-2 py-1 ${
+              pathname === "/admin" ? "border-b-2 border-blue-500" : ""
+            }`}
+          >
+            {isOpen && <LayoutDashboard className="text-gray-500" />}
+          </Link>
+
+          <Link
+            href="/admin/admin-user-list"
+            onClick={() => setLoading(true)}
+            className={`flex gap-8 items-center px-2 py-1 ${
+              pathname === "/admin/admin-user-list"
+                ? "border-b-2 border-blue-500"
+                : ""
+            }`}
+          >
+            {isOpen && <User className="text-gray-500" />}
+          </Link>
+
+          <Link
+            href="/admin/admin-status"
+            onClick={() => setLoading(true)}
+            className={`flex gap-8 items-center px-2 py-1 ${
+              pathname === "/admin/admin-status"
+                ? "border-b-2 border-blue-500"
+                : ""
+            }`}
+          >
+            {isOpen && <Ticket className="text-gray-500" />}
+          </Link>
+
+          <Link
+            href="/admin/admin-messages"
+            onClick={() => setLoading(true)}
+            className={`flex gap-8 items-center relative px-2 py-1 ${
+              pathname === "/admin/admin-messages"
+                ? "border-b-2 border-blue-500"
+                : ""
+            }`}
+          >
+            {isOpen && <MessageCircle className="text-gray-500" />}
+
+            {/* Unread badge */}
+            {totalUnread > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
+                {totalUnread}
+              </span>
+            )}
+          </Link>
+        </div>
+
+        {/* User Info & Logout */}
+        <div className="absolute bottom-5 flex items-center gap-2">
+          {isOpen && currentUserData?.profilePicture && (
+            <Avatar
+              className="w-10 h-10 rounded-md cursor-pointer"
+              onClick={() => setShowCurrentUserInfo(true)}
+            >
+              <AvatarImage src={currentUserData?.profilePicture} />
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          )}
+
+          {showCurrentUserInfo && currentUserData && (
+            <CurrentUserInfo
+              currentUserData={currentUserData}
+              setShowCurrentUserInfo={setShowCurrentUserInfo}
+              showCurrentUserInfo={showCurrentUserInfo}
+            />
+          )}
+        </div>
+      </div>
+      {/* Collapse Button */}
+      <div className="absolute cursor-pointer left-2 bottom-[25rem] z-20 lg:hidden bg-gray-500/20 p-2 rounded-sm">
+        <div
+          onClick={() => setIsOpen(!isOpen)}
+          className={`transition-transform duration-300 ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+        >
+          {isOpen ? <ChevronsLeft /> : <ChevronsRight />}
         </div>
       </div>
     </>

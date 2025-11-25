@@ -20,7 +20,7 @@ export default function PieChartOverview() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full">
-      <h2 className="text-xl font-bold mb-3 text-center">
+      <h2 className="text-xl font-bold mb-3 text-center sticky top-0 bg-white">
         Lost & Found Overview
       </h2>
 

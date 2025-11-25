@@ -1,13 +1,30 @@
+"use client";
+
 import ChatArea from "@/components/chat-area";
 import Chats from "@/components/chats";
-import { Divider } from "antd";
+import { ChatState } from "@/redux/chatSlice";
+import { useSelector } from "react-redux";
 
 const AdminMessages = () => {
+  const { selectedChat }: ChatState = useSelector((state: any) => state.chat);
   return (
-    <div className="flex h-[100vh]">
-      <Chats />
-      <Divider type="vertical" className="h-full px-0 mx-0" />
-      <ChatArea />
+    <div className="min-h-screen flex">
+      {/* LEFT COLUMN (Chats List) */}
+      <div className="lg:w-[18%] w-screen h-screen ">
+        <Chats />
+      </div>
+
+      {/* RIGHT COLUMN (Chat area on LARGE screens) */}
+      <div className="hidden lg:flex flex-1">
+        <ChatArea />
+      </div>
+
+      {/* MOBILE POP-UP CHAT AREA */}
+      {selectedChat && (
+        <div className="lg:hidden fixed inset-0 bg-white z-50">
+          <ChatArea />
+        </div>
+      )}
     </div>
   );
 };

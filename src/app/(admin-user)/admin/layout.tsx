@@ -13,8 +13,18 @@ export default async function AdminLayout({
 }>) {
   await ServerRoleGuard({ requiredRole: "admin" });
   return (
-    <div className="h-screen grid grid-cols-[auto_1fr]">
-      <Sidebar />
+    <div className="h-screen grid lg:grid-cols-[auto_1fr] relative">
+      {/* Desktop sidebar (in the grid) */}
+      <div className="hidden lg:block h-screen">
+        <Sidebar />
+      </div>
+
+      {/* Mobile sidebar (overlay) */}
+      <div className="lg:hidden absolute top-0 left-0 h-screen bg-white z-50">
+        <Sidebar />
+      </div>
+
+      {/* Main content */}
       <div className="overflow-auto">{children}</div>
     </div>
   );
