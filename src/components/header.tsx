@@ -90,7 +90,7 @@ const Header = () => {
         <div className="relative lg:hidden">
           <List size={35} onClick={() => setShowBar(true)} />
           {totalUnread > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
               {totalUnread}
             </span>
           )}

@@ -20,7 +20,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center justify-center h-[25rem]">
-            <div className="flex flex-col gap-2 w-[30%] border">
+            <div className="flex flex-col gap-2 w-[30%] ">
               <Button asChild>
                 <Link href="/lost-items">Lost</Link>
               </Button>
