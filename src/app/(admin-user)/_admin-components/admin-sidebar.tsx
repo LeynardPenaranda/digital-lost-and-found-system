@@ -112,7 +112,9 @@ const Sidebar = () => {
           <Link
             href="/admin"
             onClick={() => setLoading(true)}
-            className="flex gap-8"
+            className={`flex gap-8 items-center px-2 py-1 ${
+              pathname === "/admin" ? "border-b-2 border-blue-500" : ""
+            }`}
           >
             <LayoutDashboard className="text-gray-500" />
             {isOpen && <span className="text-gray-500">Dashboard</span>}
@@ -121,7 +123,11 @@ const Sidebar = () => {
           <Link
             href="/admin/admin-user-list"
             onClick={() => setLoading(true)}
-            className="flex gap-8"
+            className={`flex gap-8 items-center px-2 py-1 ${
+              pathname === "/admin/admin-user-list"
+                ? "border-b-2 border-blue-500"
+                : ""
+            }`}
           >
             <User className="text-gray-500" />
             {isOpen && <span className="text-gray-500">User</span>}
@@ -130,7 +136,11 @@ const Sidebar = () => {
           <Link
             href="/admin/admin-status"
             onClick={() => setLoading(true)}
-            className="flex gap-8"
+            className={`flex gap-8 items-center px-2 py-1 ${
+              pathname === "/admin/admin-status"
+                ? "border-b-2 border-blue-500"
+                : ""
+            }`}
           >
             <Ticket className="text-gray-500" />
             {isOpen && <span className="text-gray-500">Status</span>}
@@ -139,14 +149,18 @@ const Sidebar = () => {
           <Link
             href="/admin/admin-messages"
             onClick={() => setLoading(true)}
-            className="flex gap-8 relative"
+            className={`flex gap-8 items-center relative px-2 py-1 ${
+              pathname === "/admin/admin-messages"
+                ? "border-b-2 border-blue-500"
+                : ""
+            }`}
           >
             <MessageCircle className="text-gray-500" />
             {isOpen && <span className="text-gray-500">Messages</span>}
 
             {/* Unread badge */}
             {totalUnread > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
                 {totalUnread}
               </span>
             )}
