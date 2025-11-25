@@ -190,7 +190,7 @@ const Messages = () => {
       ) : (
         <div className="flex flex-col gap-3">
           {messages.map((msg) => (
-            <Message key={msg._id} message={msg} />
+            <Message key={msg._id || crypto.randomUUID()} message={msg} />
           ))}
         </div>
       )}

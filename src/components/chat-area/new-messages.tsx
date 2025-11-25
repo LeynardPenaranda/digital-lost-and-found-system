@@ -1,9 +1,8 @@
 import { Button, message } from "antd";
-import { Input } from "../ui/input";
 import { Image, SendHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { UserState } from "@/redux/userSlice";
 import { useSelector } from "react-redux";
+import { UserState } from "@/redux/userSlice";
 import { ChatState } from "@/redux/chatSlice";
 import { SendNewMessage } from "@/server-actions/messages";
 import socket from "@/config/socket-config";
@@ -21,19 +20,21 @@ const NewMessages = () => {
   const [showImageSelector, setShowImageSelector] = useState(false);
   const { selectedChat }: ChatState = useSelector((state: any) => state.chat);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [loading, setLoading] = useState(false);
 
   const onSend = async () => {
     try {
       if (!text && !selectedImageFile) return;
       setLoading(true);
+
       let image = "";
       if (selectedImageFile) {
         image = await UploadImageToFireBaseAndReturnUrlMessage(
           selectedImageFile
         );
       }
+
       const commonPayload = {
         text,
         image,
@@ -42,18 +43,22 @@ const NewMessages = () => {
         updatedAt: dayjs().toISOString(),
         readBy: [],
       };
+
       const socketPayload = {
         ...commonPayload,
         chat: selectedChat,
         sender: currentUserData,
       };
 
-      // send message using socket
+      // Send via socket
       socket.emit("send-new-message", socketPayload);
+
+      // Reset input
       setText("");
       setSelectedImageFile(null);
-      setShowImageSelector(false);
       setShowEmoji(false);
+      setShowImageSelector(false);
+
       const dbPayload = {
         ...commonPayload,
         sender: currentUserData?._id!,
@@ -74,59 +79,83 @@ const NewMessages = () => {
     });
   }, [selectedChat, text]);
 
+  const autoResize = (el: HTMLTextAreaElement) => {
+    el.style.height = "auto"; // reset height
+    el.style.height = el.scrollHeight + "px"; // grow with content
+  };
+
   return (
-    <div className="p-3 bg-gray-100 border-t border-gray-100 flex gap-5 items-center relative">
-      <div>
+    <div className="p-3 bg-gray-100 border-t border-gray-100 flex gap-3 items-end relative">
+      {/* Left buttons */}
+      <div className="flex flex-col justify-end gap-2">
         {showEmoji && (
-          <div className="absolute left-2 bottom-12">
+          <div className="absolute left-2 bottom-28 z-50">
             <EmojiPicker
               height={350}
-              previewConfig={{
-                showPreview: false, // hides the emoji name/description on hover
-              }}
+              previewConfig={{ showPreview: false }}
               onEmojiClick={(emojiObject: any) => {
-                setText((prevText) => prevText + emojiObject.emoji);
+                setText((prev) => prev + emojiObject.emoji);
                 inputRef.current?.focus();
               }}
             />
           </div>
         )}
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setShowEmoji(!showEmoji)}
-            type={showEmoji ? `primary` : `default`}
-          >
-            {showEmoji ? (
-              <X size={14} />
-            ) : (
-              <i className="ri-emoji-sticker-line"></i>
-            )}
-          </Button>
-          <Button onClick={() => setShowImageSelector(!showImageSelector)}>
-            <Image size={14} />
-          </Button>
-        </div>
+        <Button
+          onClick={() => setShowEmoji(!showEmoji)}
+          type={showEmoji ? "primary" : "default"}
+        >
+          {showEmoji ? (
+            <X size={14} />
+          ) : (
+            <i className="ri-emoji-sticker-line"></i>
+          )}
+        </Button>
+        <Button onClick={() => setShowImageSelector(!showImageSelector)}>
+          <Image size={14} />
+        </Button>
       </div>
+
+      {/* Textarea */}
       <div className="flex-1">
-        <Input
-          type="text"
+        <textarea
           placeholder="Type a message"
-          className="  focus-visible:ring-0 focus-visible:ring-offset-0 
-          focus-visible:outline-none focus-visible:border-gray-300 bg-white"
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            setText(e.target.value);
+            autoResize(e.target);
+          }}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
               onSend();
             }
           }}
           ref={inputRef}
+          className="
+            w-full
+            resize-none
+            rounded-md
+            px-3 py-2
+            bg-white
+            focus-visible:ring-0 focus-visible:ring-offset-0
+            focus-visible:outline-none
+            focus-visible:border-gray-300
+            overflow-auto
+            max-h-[120px]         /* mobile max height */
+            lg:max-h-[90px]       /* large screen max height */
+          "
+          style={{ minHeight: "40px" }}
         />
       </div>
-      <Button type="primary" onClick={() => onSend()}>
-        <SendHorizontal />
-      </Button>
 
+      {/* Send button */}
+      <div className="flex flex-col justify-end">
+        <Button type="primary" onClick={() => onSend()}>
+          <SendHorizontal />
+        </Button>
+      </div>
+
+      {/* Image selector */}
       {showImageSelector && (
         <ImageSelector
           showImageSelector={showImageSelector}

@@ -1,5 +1,6 @@
 "use client";
 
+import { NotificationState } from "@/redux/notificationSlice";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -17,16 +18,22 @@ const NavLinks = ({ className }: { className?: string }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const { chatUnread } = useSelector((state: any) => state.notifications);
+  const { chatUnread }: NotificationState = useSelector(
+    (state: any) => state.notifications
+  );
+
+  // Sum all unread counts
+  const totalUnread = Object.values(chatUnread).reduce(
+    (acc, curr) => acc + (curr.count || 0),
+    0
+  );
 
   const handleNavigate = (href: string) => {
     setLoading(true);
     router.push(href);
   };
 
-  // 👇 This fixes your problem
   useEffect(() => {
-    // When the pathname changes → stop loading
     setLoading(false);
   }, [pathname]);
 
@@ -46,13 +53,20 @@ const NavLinks = ({ className }: { className?: string }) => {
           {navlinks.map((link) => {
             const isActive = pathname === link.href;
             return (
-              <li key={link.name}>
+              <li key={link.name} className="relative">
                 <button
                   onClick={() => handleNavigate(link.href)}
                   className={`${isActive ? "border-b-2 border-blue-900" : ""}`}
                 >
                   {link.name}
                 </button>
+
+                {/* Show unread badge only for Messages link */}
+                {link.name === "Messages" && totalUnread > 0 && (
+                  <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                    {totalUnread}
+                  </span>
+                )}
               </li>
             );
           })}

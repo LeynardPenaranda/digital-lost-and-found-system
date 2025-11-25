@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface NotificationState {
+export interface NotificationState {
   chatUnread: {
     [chatId: string]: {
       count: number;

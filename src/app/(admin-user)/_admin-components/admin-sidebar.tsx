@@ -22,9 +22,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { NotificationState } from "@/redux/notificationSlice";
 
 const Sidebar = () => {
   const { currentUserData } = useSelector((state: any) => state.user);
+  const { chatUnread }: NotificationState = useSelector(
+    (state: any) => state.notifications
+  );
+
   const [showCurrentUserInfo, setShowCurrentUserInfo] = useState(false);
   const [loading, setLoading] = useState(false);
   const pathname = usePathname();
@@ -34,7 +39,6 @@ const Sidebar = () => {
   const router = useRouter();
   const { signOut } = useClerk();
 
-  // Reset loading when pathname changes (navigation finished)
   useEffect(() => {
     setLoading(false);
   }, [pathname]);
@@ -70,12 +74,17 @@ const Sidebar = () => {
   useEffect(() => {
     if (currentUserData) {
       socket.emit("join", currentUserData?._id);
-
       socket.on("online-users-updated", (onlineUser: string[]) => {
         dispatch(setOnlineUsers(onlineUser));
       });
     }
   }, [currentUserData]);
+
+  // Calculate total unread messages
+  const totalUnread = Object.values(chatUnread).reduce(
+    (acc, curr) => acc + (curr.count || 0),
+    0
+  );
 
   return (
     <>
@@ -130,10 +139,17 @@ const Sidebar = () => {
           <Link
             href="/admin/admin-messages"
             onClick={() => setLoading(true)}
-            className="flex gap-8"
+            className="flex gap-8 relative"
           >
             <MessageCircle className="text-gray-500" />
             {isOpen && <span className="text-gray-500">Messages</span>}
+
+            {/* Unread badge */}
+            {totalUnread > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                {totalUnread}
+              </span>
+            )}
           </Link>
         </div>
 

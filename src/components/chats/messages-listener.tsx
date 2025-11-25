@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import socket from "@/config/socket-config";
 import { toast } from "sonner";
 import { ChatState } from "@/redux/chatSlice";
 import { UserState } from "@/redux/userSlice";
 import { incrementUnread } from "@/redux/notificationSlice";
+import Image from "next/image";
 
 export default function MessagesListener({
   children,
@@ -18,7 +19,18 @@ export default function MessagesListener({
   const { currentUserData }: UserState = useSelector(
     (state: any) => state.user
   );
-  const { chatUnread } = useSelector((state: any) => state.notifications); // <-- get unread counts
+  const { chatUnread } = useSelector((state: any) => state.notifications);
+
+  // Notification sound
+  const notificationSound = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio("/notification.wav");
+    audio.addEventListener("error", () => {
+      console.error("Failed to load notification.wav");
+    });
+    notificationSound.current = audio;
+  }, []);
 
   useEffect(() => {
     socket.on("new-message-received", (message) => {
@@ -35,25 +47,33 @@ export default function MessagesListener({
           lastSenderName: message.sender?.name || "",
         };
 
-        // Get the current count from Redux (optional fallback)
         const currentCount = chatUnread[chatId]?.count || 0;
-
-        // Increment manually for toast
         const newCount = currentCount + 1;
 
-        // Dispatch to Redux
         dispatch(incrementUnread(incrementPayload));
 
-        // Show toast using the incremented count
+        // 🔔 Play sound ONLY when unread message received
+        if (notificationSound.current) {
+          notificationSound.current.currentTime = 0;
+          notificationSound.current.play().catch(() => {});
+        }
+
+        // Toast notification
         toast(
           <div className="flex items-center gap-2">
-            <i className="ri-mail-unread-line text-green-500 text-2xl relative">
+            <div className="relative">
+              <Image
+                src="/messages.png"
+                alt="messages Logo"
+                width={40}
+                height={40}
+              />
               {newCount > 0 && (
                 <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                   {newCount}
                 </span>
               )}
-            </i>
+            </div>
             <div className="flex flex-col">
               <span className="font-semibold text-sm">
                 {message.sender?.name?.split(" ")[0] || "Unknown"}
@@ -76,7 +96,7 @@ export default function MessagesListener({
     return () => {
       socket.off("new-message-received");
     };
-  }, [selectedChat, currentUserData, chatUnread]); // <-- add chatUnread to dependency
+  }, [selectedChat, currentUserData, chatUnread]);
 
   return <>{children}</>;
 }

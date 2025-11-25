@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import socket from "@/config/socket-config";
 import { List } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { NotificationState } from "@/redux/notificationSlice";
 
 const Header = () => {
   const [showCurrentUserInfo, setShowCurrentUserInfo] = useState(false);
@@ -23,6 +24,10 @@ const Header = () => {
   const { currentUserData }: UserState = useSelector(
     (state: any) => state.user
   );
+  const { chatUnread }: NotificationState = useSelector(
+    (state: any) => state.notifications
+  );
+
   const pathname = usePathname();
   const dispatch = useDispatch();
 
@@ -43,7 +48,6 @@ const Header = () => {
     if (currentUserData) {
       socket.emit("join", currentUserData?._id);
 
-      // This set the online users to the redux or user slice
       socket.on("online-users-updated", (onlineUser: string[]) => {
         dispatch(setOnlineUsers(onlineUser));
       });
@@ -51,9 +55,14 @@ const Header = () => {
   }, [currentUserData]);
 
   useEffect(() => {
-    // Close drawer whenever route changes
-    setShowBar(false);
+    setShowBar(false); // Close drawer when route changes
   }, [pathname]);
+
+  // Sum all unread counts
+  const totalUnread = Object.values(chatUnread).reduce(
+    (acc, curr) => acc + (curr.count || 0),
+    0
+  );
 
   return (
     <header className="border h-[5rem] flex items-center justify-between bg-gray-100 sticky top-0 z-50">
@@ -76,10 +85,18 @@ const Header = () => {
           <AvatarImage src={currentUserData?.profilePicture} />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
-        <div className="lg:hidden">
+
+        {/* Mobile hamburger icon with unread badge */}
+        <div className="relative lg:hidden">
           <List size={35} onClick={() => setShowBar(true)} />
+          {totalUnread > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+              {totalUnread}
+            </span>
+          )}
         </div>
       </div>
+
       {showCurrentUserInfo && currentUserData && (
         <CurrentUserInfo
           currentUserData={currentUserData}

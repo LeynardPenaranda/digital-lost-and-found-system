@@ -71,21 +71,21 @@ const Message = ({ message }: { message: MessageType }) => {
         <div className="max-w-[320px] w-fit">
           <span className="text-blue-500 text-sm">{message.sender.name}</span>
 
-          {message.text && (
-            <p className="bg-gray-200 text-primary py-2 px-5 rounded-xl rounded-tl-none">
-              {message.text}
-            </p>
-          )}
-          {message.image && (
-            <div className="bg-gray-200 py-2 px-5 rounded-xl rounded-tl-none">
+          <div className="bg-gray-200 text-black p-3 rounded-xl rounded-tl-none max-w-[250px] space-y-2">
+            {message.text && (
+              <p className="whitespace-pre-line break-words">{message.text}</p>
+            )}
+
+            {message.image && (
               <Image
                 src={message.image}
                 alt="chat-image"
                 width={190}
                 height={190}
+                className="rounded-md"
               />
-            </div>
-          )}
+            )}
+          </div>
           <span className="text-[13px] text-gray-400">
             {formatDateTime(message.createdAt)}
           </span>
