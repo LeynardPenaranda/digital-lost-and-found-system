@@ -153,19 +153,23 @@ export default function AdminPage() {
         {/* Table here */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Recent Lost Table */}
-          <Card className="p-0 overflow-x-auto lg:overflow-x-visible lg:max-h-[400px] lg:overflow-y-auto">
-            <div className="sticky top-0 z-10 bg-white p-2 border-b text-gray-500">
-              Recent Lost Items Report
+          <Card className="p-0 max-h-[300px] lg:max-h-[400px] overflow-auto">
+            <div className="inline-block min-w-full">
+              <div className="sticky top-0 z-10 bg-white p-2 border-b text-gray-500">
+                Recent Lost Items Report
+              </div>
+              <RecentLostTable data={recentLost} />
             </div>
-            <RecentLostTable data={recentLost} />
           </Card>
 
           {/* Recent Found Table */}
-          <Card className="p-0 overflow-x-auto lg:overflow-x-visible lg:max-h-[400px] lg:overflow-y-auto">
-            <div className="sticky top-0 z-10 bg-white p-2 border-b text-gray-500">
-              Recent Found Items Report
+          <Card className="p-0 max-h-[300px] lg:max-h-[400px] overflow-auto">
+            <div className="inline-block min-w-full">
+              <div className="sticky top-0 z-10 bg-white p-2 border-b text-gray-500">
+                Recent Found Items Report
+              </div>
+              <RecentFoundTable data={recentFound} />
             </div>
-            <RecentFoundTable data={recentFound} />
           </Card>
         </div>
       </div>
