@@ -68,7 +68,19 @@ export default function RecentFoundTable({ data }: Props) {
                 </TableCell>
                 <TableCell className="font-medium">{report.item}</TableCell>
                 <TableCell>{report.location}</TableCell>
-                <TableCell>{report.foundItemStatus}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-semibold border ${
+                      report.foundItemStatus === "pending"
+                        ? "text-yellow-500 border-yellow-500"
+                        : report.foundItemStatus === "claimed"
+                        ? "text-green-500 border-green-500"
+                        : "text-gray-400 border-gray-400"
+                    }`}
+                  >
+                    {report.foundItemStatus}
+                  </span>
+                </TableCell>
                 <TableCell>{report.reportedBy?.name || "Unknown"}</TableCell>
                 <TableCell className="text-right">
                   {formatDateTime(report.createdAt)}

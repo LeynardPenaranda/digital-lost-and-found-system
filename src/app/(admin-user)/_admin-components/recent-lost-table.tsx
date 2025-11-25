@@ -70,7 +70,19 @@ export default function RecentLostTable({ data }: Props) {
                 </TableCell>
                 <TableCell className="font-medium">{report.item}</TableCell>
                 <TableCell>{report.location}</TableCell>
-                <TableCell>{report.lostItemStatus}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-semibold border ${
+                      report.lostItemStatus === "pending"
+                        ? "text-yellow-500 border-yellow-500"
+                        : report.lostItemStatus === "found"
+                        ? "text-green-500 border-green-500"
+                        : "text-gray-400 border-gray-400"
+                    }`}
+                  >
+                    {report.lostItemStatus}
+                  </span>
+                </TableCell>
                 <TableCell>{report.reportedBy?.name || "Unknown"}</TableCell>
                 <TableCell className="text-right">
                   {formatDateTime(report.createdAt)}
