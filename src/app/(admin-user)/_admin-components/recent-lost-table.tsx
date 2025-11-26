@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDateTime } from "@/lib/date-formats";
+import { formatDateTimeTable } from "@/lib/date-formats";
 
 type Props = {
   data: any[] | null;
@@ -54,20 +54,22 @@ export default function RecentLostTable({ data }: Props) {
             data.map((report, index) => (
               <TableRow key={index}>
                 <TableCell className="p-1">
-                  {report.lostItemsImages?.[0] ? (
-                    <Image
-                      src={report.lostItemsImages[0]}
-                      alt={report.item}
-                      width={60}
-                      height={60}
-                      className="object-cover rounded"
-                    />
-                  ) : (
-                    <div className="w-14 h-14 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
-                      No Image
-                    </div>
-                  )}
+                  <div className="w-16 h-16 relative rounded overflow-hidden bg-gray-200">
+                    {report.lostItemsImages?.[0] ? (
+                      <Image
+                        src={report.lostItemsImages[0]}
+                        alt={report.item}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+                        No Image
+                      </div>
+                    )}
+                  </div>
                 </TableCell>
+
                 <TableCell className="font-medium">{report.item}</TableCell>
                 <TableCell>{report.location}</TableCell>
                 <TableCell>
@@ -85,7 +87,7 @@ export default function RecentLostTable({ data }: Props) {
                 </TableCell>
                 <TableCell>{report.reportedBy?.name || "Unknown"}</TableCell>
                 <TableCell className="text-right">
-                  {formatDateTime(report.createdAt)}
+                  {formatDateTimeTable(report.createdAt)}
                 </TableCell>
               </TableRow>
             ))

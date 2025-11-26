@@ -13,3 +13,7 @@ export const formatDateTime = (date: string | Date) => {
   if (diffYears < 1) return messageDate.format("MMM DD hh:mm A"); // same year
   return messageDate.format("MMM DD YYYY hh:mm A"); // older than a year
 };
+
+export const formatDateTimeTable = (date: string | Date) => {
+  return dayjs(date).format("MMM DD, YYYY - h:mm A");
+};

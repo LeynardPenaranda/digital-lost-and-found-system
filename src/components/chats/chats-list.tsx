@@ -101,7 +101,11 @@ const ChatList = () => {
         <div>No chats available. Press + to add chats</div>
       )}
       {!loading &&
-        sortedChats.map((chat) => <ChatCard key={chat._id} chat={chat} />)}
+        sortedChats
+          .filter((chat) =>
+            chat.users.some((u) => u && u._id !== currentUserData?._id)
+          )
+          .map((chat) => <ChatCard key={chat._id} chat={chat} />)}
     </div>
   );
 };
