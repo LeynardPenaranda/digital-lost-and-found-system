@@ -15,7 +15,6 @@ const FoundItemsContent = () => {
   const [foundItems, setFoundItems] = useState<FoundItemReportType[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // NEW: state for switching tabs
   const [statusFilter, setStatusFilter] = useState<"pending" | "claimed">(
     "pending"
   );
@@ -27,8 +26,25 @@ const FoundItemsContent = () => {
       const response = await getAllFoundItems(searchQuery, statusFilter);
 
       if ("error" in response) throw new Error(response.error);
-      console.log(response);
-      setFoundItems(response);
+
+      // Filter out deleted users first, then map
+      const transformed = response
+        .filter((item: FoundItemReportType) => item.reportedBy) // remove deleted users
+        .map((item: FoundItemReportType) => {
+          const fullName = item.reportedBy!.name || "Unknown"; // ! because we filtered null
+          const isAdmin = item.reportedBy!.role === "admin";
+          const firstName = fullName.split(" ")[0];
+
+          return {
+            ...item,
+            reportedBy: {
+              ...item.reportedBy,
+              displayName: isAdmin ? `${firstName} - Admin` : fullName,
+            },
+          };
+        });
+
+      setFoundItems(transformed);
     } catch (error: any) {
       message.error("Failed to get the found items report");
     } finally {
@@ -38,12 +54,14 @@ const FoundItemsContent = () => {
 
   useEffect(() => {
     fetchFoundItems();
-  }, [searchQuery, statusFilter]); // Re-fetch when search or tab changes
+  }, [searchQuery, statusFilter]);
 
   useEffect(() => {
     socket.on("found-item-created", (newReport: FoundItemReportType) => {
-      // Only add report if it matches current tab (pending/found)
-      if (newReport.foundItemStatus === statusFilter) {
+      if (
+        newReport.foundItemStatus === statusFilter &&
+        newReport.reportedBy // only add if reporter exists
+      ) {
         setFoundItems((prev) => [newReport, ...prev]);
       }
     });
@@ -54,7 +72,7 @@ const FoundItemsContent = () => {
   }, [statusFilter]);
 
   return (
-    <div className="grid grid-cols-1 grid-rows-[auto_1fr] h-[50rem] w-full ">
+    <div className="grid grid-cols-1 grid-rows-[auto_1fr] h-[50rem] w-full">
       {/* FILTER TABS */}
       <div className="flex items-center justify-center mt-10">
         <div className="flex gap-3">
@@ -81,12 +99,12 @@ const FoundItemsContent = () => {
       {/* CONTENT SECTION */}
       <div className="w-full h-[40rem] overflow-y-auto mt-5">
         {loading && <Spin size="large" className="my-10 flex justify-center" />}
-        {foundItems.length === 0 && !loading && (
+        {!loading && foundItems.length === 0 && (
           <span className="text-[2rem] text-gray-400 font-semibold my-10 flex justify-center">
             No {statusFilter} found items...
           </span>
         )}
-        {!loading && (
+        {!loading && foundItems.length > 0 && (
           <div className="flex gap-10 flex-wrap justify-center">
             {foundItems.map((items) => (
               <FoundItemCard key={items._id} items={items} />

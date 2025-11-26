@@ -295,12 +295,13 @@ const UsersTable: React.FC = () => {
 
   return (
     <>
-      <div className="w-full overflow-auto">
+      <div className="w-[90%] overflow-auto">
         <Table
           columns={columns}
           dataSource={data}
           loading={loading}
           rowKey="_id"
+          rowClassName="!h-10 [&>td]:!py-1 [&>td]:!px-2" // set row height and cell padding
           onRow={(record) => ({
             onClick: () => onRowClick(record),
             style: { cursor: "pointer" },

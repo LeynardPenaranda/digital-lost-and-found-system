@@ -15,7 +15,7 @@ const LostItemsContent = () => {
   const [lostItems, setLostItems] = useState<LostItemReportType[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // NEW: state for switching tabs
+  // Tab state: "pending" or "found"
   const [statusFilter, setStatusFilter] = useState<"pending" | "found">(
     "pending"
   );
@@ -26,11 +26,34 @@ const LostItemsContent = () => {
 
       const response = await getAllLostItems(searchQuery, statusFilter);
 
-      if ("error" in response) throw new Error(response.error);
+      if (!response.success) throw new Error(response.message || "Failed");
 
-      setLostItems(response);
-    } catch (error: any) {
-      message.error("Failed to get the lost items report");
+      const dataArray = Array.isArray(response.data) ? response.data : [];
+
+      // Filter out items where the reporter was deleted
+      const transformed = dataArray
+        .filter((item) => item.reportedBy) // remove deleted users
+        .map((item: LostItemReportType) => {
+          const fullName = item.reportedBy?.name || "Unknown";
+          const isAdmin = item.reportedBy?.role === "admin";
+          const firstName = fullName.split(" ")[0];
+
+          return {
+            ...item,
+            reportedBy: {
+              ...item.reportedBy,
+              displayName: isAdmin ? `${firstName} - Admin` : fullName,
+            },
+          };
+        });
+
+      setLostItems(transformed);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(error.message);
+      } else {
+        message.error("Failed to get the lost items report");
+      }
     } finally {
       setLoading(false);
     }
@@ -38,12 +61,12 @@ const LostItemsContent = () => {
 
   useEffect(() => {
     fetchLostItems();
-  }, [searchQuery, statusFilter]); // Re-fetch when search or tab changes
+  }, [searchQuery, statusFilter]);
 
   useEffect(() => {
     socket.on("lost-item-created", (newReport) => {
-      // Only add report if it matches current tab (pending/found)
-      if (newReport.lostItemStatus === statusFilter) {
+      // Only add if matches current tab and has a valid reporter
+      if (newReport.lostItemStatus === statusFilter && newReport.reportedBy) {
         setLostItems((prev) => [newReport, ...prev]);
       }
     });
@@ -54,7 +77,7 @@ const LostItemsContent = () => {
   }, [statusFilter]);
 
   return (
-    <div className="grid grid-cols-1 grid-rows-[auto_1fr] h-[50rem] w-full ">
+    <div className="grid grid-cols-1 grid-rows-[auto_1fr] h-[50rem] w-full">
       {/* FILTER TABS */}
       <div className="flex items-center justify-center mt-10">
         <div className="flex gap-3">
@@ -81,12 +104,12 @@ const LostItemsContent = () => {
       {/* CONTENT SECTION */}
       <div className="w-full h-[40rem] overflow-y-auto mt-5">
         {loading && <Spin size="large" className="my-10 flex justify-center" />}
-        {lostItems.length === 0 && !loading && (
+        {!loading && lostItems.length === 0 && (
           <span className="text-[2rem] text-gray-400 font-semibold my-10 flex justify-center">
             No {statusFilter} lost items...
           </span>
         )}
-        {!loading && (
+        {!loading && lostItems.length > 0 && (
           <div className="flex gap-10 flex-wrap justify-center">
             {lostItems.map((items) => (
               <LostItemCard key={items._id} items={items} />

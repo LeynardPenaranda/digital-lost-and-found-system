@@ -77,7 +77,9 @@ const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-xs">{items.reportedBy.name}</span>
+              <span className="text-xs">
+                {items.reportedBy.displayName ?? items.reportedBy.name}
+              </span>
               <div>
                 <span className="text-xs">reported on </span>
                 <span className="text-xs">
@@ -160,7 +162,9 @@ const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-xs">{items.reportedBy.name}</span>
+              <span className="text-xs">
+                {items.reportedBy.displayName ?? items.reportedBy.name}
+              </span>
               <div>
                 <span className="text-xs">reported on </span>
                 <span className="text-xs">

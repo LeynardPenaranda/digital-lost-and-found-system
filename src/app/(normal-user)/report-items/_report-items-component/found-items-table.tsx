@@ -2,11 +2,13 @@
 
 import { Table, Button, Select, message } from "antd";
 import { useState, useEffect } from "react";
-import { FoundItemReportType, LostItemReportType } from "@/interfaces";
+import { FoundItemReportType } from "@/interfaces";
 import {
   deleteFoundItems,
   updateFoundItemStatus,
 } from "@/server-actions/found-items-report";
+import { useSelector } from "react-redux";
+import { UserState } from "@/redux/userSlice";
 
 interface FoundItemTableProps {
   items: FoundItemReportType[];
@@ -17,6 +19,11 @@ export default function FoundItemTable({
   items,
   loading = false,
 }: FoundItemTableProps) {
+  const { currentUserData }: UserState = useSelector(
+    (state: any) => state.user
+  );
+  const isAdmin = currentUserData?.role === "admin";
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState<FoundItemReportType[]>(
     items || []
@@ -56,7 +63,7 @@ export default function FoundItemTable({
       await updateFoundItemStatus(record._id, value);
       setTableData((prev) =>
         prev.map((item) =>
-          item._id === record._id ? { ...item, lostItemStatus: value } : item
+          item._id === record._id ? { ...item, foundItemStatus: value } : item
         )
       );
       message.success("Status updated!");
@@ -73,13 +80,38 @@ export default function FoundItemTable({
   };
 
   const columns = [
+    ...(isAdmin
+      ? [
+          {
+            title: "Reporter",
+            dataIndex: "reportedBy",
+            render: (reportedBy: any) => (
+              <div className="flex items-center gap-2">
+                <img
+                  src={reportedBy?.profilePicture || "/default-profile.png"}
+                  alt="profile"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              </div>
+            ),
+          },
+          {
+            title: "Name",
+            dataIndex: "reportedBy",
+            render: (reportedBy: any) =>
+              reportedBy?._id === currentUserData?._id
+                ? "You"
+                : reportedBy?.name || "Unknown",
+          },
+        ]
+      : []),
     {
       title: "Image",
       dataIndex: "foundItemsImages",
       render: (images: string[]) => (
         <img
           src={images?.[0] || "/placeholder.png"}
-          alt="lost item"
+          alt="found item"
           style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 4 }}
         />
       ),
@@ -97,7 +129,7 @@ export default function FoundItemTable({
           style={{ width: 100 }}
         >
           <Select.Option value="pending">Pending</Select.Option>
-          <Select.Option value="claimed">claimed</Select.Option>
+          <Select.Option value="claimed">Claimed</Select.Option>
         </Select>
       ),
     },
@@ -114,8 +146,8 @@ export default function FoundItemTable({
 
   return (
     <div className="grid grid-rows-[auto_1fr] gap-2 h-full">
-      {/* Row 1: Delete button placeholder */}
-      <div style={{ minHeight: 50 }} className="">
+      {/* Row 1: Delete button */}
+      <div style={{ minHeight: 50 }}>
         {selectedRowKeys.length > 0 && (
           <Button type="primary" danger onClick={handleDelete}>
             Delete Selected
@@ -131,7 +163,7 @@ export default function FoundItemTable({
           rowKey="_id"
           dataSource={tableData}
           loading={loading}
-          scroll={{ x: "max-content" }} // <-- makes it responsive
+          scroll={{ x: "max-content" }}
           onRow={(record) => ({
             onClick: () => setSelectedRowKeys([record._id]),
           })}

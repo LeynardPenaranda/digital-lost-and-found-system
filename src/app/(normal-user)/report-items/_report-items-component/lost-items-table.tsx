@@ -7,6 +7,8 @@ import {
   updateLostItemStatus,
   deleteLostItems,
 } from "@/server-actions/lost-items-report";
+import { useSelector } from "react-redux";
+import { UserState } from "@/redux/userSlice";
 
 interface LostItemTableProps {
   items: LostItemReportType[];
@@ -17,22 +19,22 @@ export default function LostItemTable({
   items,
   loading = false,
 }: LostItemTableProps) {
+  const { currentUserData }: UserState = useSelector(
+    (state: any) => state.user
+  );
+  const isAdmin = currentUserData?.role === "admin";
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState<LostItemReportType[]>(items || []);
 
-  useEffect(() => {
-    setTableData(items || []);
-  }, [items]);
+  useEffect(() => setTableData(items || []), [items]);
 
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) =>
     setSelectedRowKeys(newSelectedRowKeys);
-  };
 
   const handleDelete = async () => {
-    if (selectedRowKeys.length === 0) {
-      message.warning("Please select at least one item to delete.");
-      return;
-    }
+    if (!selectedRowKeys.length)
+      return message.warning("Please select at least one item to delete.");
     try {
       await deleteLostItems(selectedRowKeys as string[]);
       setTableData(
@@ -71,6 +73,31 @@ export default function LostItemTable({
   };
 
   const columns = [
+    ...(isAdmin
+      ? [
+          {
+            title: "Reporter",
+            dataIndex: "reportedBy",
+            render: (reportedBy: any) => (
+              <div className="flex items-center gap-2">
+                <img
+                  src={reportedBy?.profilePicture || "/default-profile.png"}
+                  alt="profile"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              </div>
+            ),
+          },
+          {
+            title: "Name",
+            dataIndex: "reportedBy",
+            render: (reportedBy: any) =>
+              reportedBy?._id === currentUserData?._id
+                ? "You"
+                : reportedBy?.name || "Unknown",
+          },
+        ]
+      : []),
     {
       title: "Image",
       dataIndex: "lostItemsImages",
@@ -112,16 +139,13 @@ export default function LostItemTable({
 
   return (
     <div className="grid grid-rows-[auto_1fr] gap-2 h-full">
-      {/* Row 1: Delete button placeholder */}
-      <div style={{ minHeight: 50 }} className="">
+      <div style={{ minHeight: 50 }}>
         {selectedRowKeys.length > 0 && (
           <Button type="primary" danger onClick={handleDelete}>
             Delete Selected
           </Button>
         )}
       </div>
-
-      {/* Row 2: Table */}
       <div className="overflow-x-auto">
         <Table
           rowSelection={rowSelection}
@@ -133,10 +157,7 @@ export default function LostItemTable({
           onRow={(record) => ({
             onClick: () => setSelectedRowKeys([record._id]),
           })}
-          pagination={{
-            pageSize: 5,
-            showSizeChanger: true,
-          }}
+          pagination={{ pageSize: 5, showSizeChanger: true }}
         />
       </div>
     </div>

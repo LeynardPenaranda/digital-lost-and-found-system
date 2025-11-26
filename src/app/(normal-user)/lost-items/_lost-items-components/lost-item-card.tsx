@@ -82,7 +82,9 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-xs">{items.reportedBy.name}</span>
+              <span className="text-xs">
+                {items.reportedBy.displayName ?? items.reportedBy.name}
+              </span>
               <div>
                 <span className="text-xs">reported on </span>
                 <span className="text-xs">
@@ -172,7 +174,9 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-xs">{items.reportedBy.name}</span>
+              <span className="text-xs">
+                {items.reportedBy.displayName ?? items.reportedBy.name}
+              </span>
               <div>
                 <span className="text-xs">reported on </span>
                 <span className="text-xs">

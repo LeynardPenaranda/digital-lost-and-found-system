@@ -76,23 +76,22 @@ export const createLostItemReport = async (payload: {
 export const getAllLostItems = async (searchQuery = "", status?: string) => {
   try {
     let filter: any = {};
-
-    if (searchQuery) {
-      filter.item = { $regex: searchQuery, $options: "i" };
-    }
-
-    if (status) {
-      filter.lostItemStatus = status;
-    }
+    if (searchQuery) filter.item = { $regex: searchQuery, $options: "i" };
+    if (status) filter.lostItemStatus = status;
 
     const lostItems = await LostItemModel.find(filter)
       .populate("reportedBy")
       .sort({ createdAt: -1 });
 
-    return JSON.parse(JSON.stringify(lostItems));
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(lostItems)),
+    };
   } catch (error: any) {
     return {
-      error: error.message,
+      success: false,
+      data: [],
+      message: error.message,
     };
   }
 };

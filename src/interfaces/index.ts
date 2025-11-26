@@ -8,6 +8,7 @@ export interface UserType {
   role: "admin" | "user";
   createdAt: Date;
   updatedAt: Date;
+  displayName?: string;
 }
 
 export interface ChatType {
