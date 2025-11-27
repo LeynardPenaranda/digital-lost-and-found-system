@@ -9,6 +9,8 @@ export interface UserType {
   createdAt: Date;
   updatedAt: Date;
   displayName?: string;
+  isBanned?: string;
+  banReason?: string;
 }
 
 export interface ChatType {
