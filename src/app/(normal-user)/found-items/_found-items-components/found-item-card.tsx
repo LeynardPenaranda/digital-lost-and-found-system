@@ -147,13 +147,17 @@ const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
             {currentUserData?._id === items?.reportedBy._id ? (
               <div>This is your card</div>
             ) : (
-              <Button
-                className="w-full"
-                onClick={openChat}
-                disabled={contacting}
-              >
-                {contacting ? "Contacting..." : "Contact"}
+              <Button className="w-full" onClick={openChat}>
+                Contact
               </Button>
+            )}
+            {contacting && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+                <div className="h-12 w-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
+                <span className="text-white text-sm font-medium tracking-wide animate-pulse">
+                  Contacting...
+                </span>
+              </div>
             )}
           </div>
         </CardFooter>
@@ -236,13 +240,17 @@ const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
             {currentUserData?._id === items?.reportedBy._id ? (
               <div>This is your card</div>
             ) : (
-              <Button
-                className="w-full"
-                onClick={openChat}
-                disabled={contacting}
-              >
-                {contacting ? "Contacting..." : "Contact"}
+              <Button className="w-full" onClick={openChat}>
+                Contact
               </Button>
+            )}
+            {contacting && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+                <div className="h-12 w-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
+                <span className="text-white text-sm font-medium tracking-wide animate-pulse">
+                  Contacting...
+                </span>
+              </div>
             )}
           </div>
         </CardFooter>

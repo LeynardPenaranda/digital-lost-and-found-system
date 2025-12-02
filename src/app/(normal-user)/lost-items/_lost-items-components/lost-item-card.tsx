@@ -152,11 +152,11 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
               </Button>
             )}
 
-            {loading && (
+            {contacting && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center z-50">
                 <div className="h-12 w-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
                 <span className="text-white text-sm font-medium tracking-wide animate-pulse">
-                  Connecting...
+                  Contacting...
                 </span>
               </div>
             )}
@@ -243,11 +243,11 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
                 Contact
               </Button>
             )}
-            {loading && (
+            {contacting && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center z-50">
                 <div className="h-12 w-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
                 <span className="text-white text-sm font-medium tracking-wide animate-pulse">
-                  Connecting...
+                  Contacting...
                 </span>
               </div>
             )}

@@ -10,6 +10,10 @@ const SignInSide = () => {
         height={450}
         quality={100}
       />
+
+      <div>
+        
+      </div>
     </div>
   );
 };
