@@ -21,7 +21,7 @@ import { message } from "antd";
 
 const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
   const [showMore, setShowMore] = useState(false);
-
+  const [contacting, setContacting] = useState(false);
   const descriptionTooLong = items.itemDescription.length > 155;
 
   const dispatch = useDispatch();
@@ -34,33 +34,42 @@ const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
   const openChat = async () => {
     if (!currentUserData?._id) return;
 
-    // Get or create chat
-    const chat = await GetOrCreateChat(
-      currentUserData._id,
-      items.reportedBy._id
-    );
+    try {
+      setContacting(true); // Start loader
 
-    if (chat.error) return message.error(chat.error);
+      // Get or create chat
+      const chat = await GetOrCreateChat(
+        currentUserData._id,
+        items.reportedBy._id
+      );
 
-    // Auto-send item details message
-    await SendMessage({
-      chatId: chat._id,
-      sender: currentUserData._id,
-      text: [
-        `Item name: ${items.item}`,
-        `Location: ${items.location}`,
-        `Current Status: Lost ${items.foundItemStatus}`,
-      ].join("\n"),
+      if (chat.error) {
+        message.error(chat.error);
+        return;
+      }
 
-      // 👇 Store the FIRST lost item image properly here
-      image: items.foundItemsImages?.[0] || "",
-    });
+      // Auto-send item details message
+      await SendMessage({
+        chatId: chat._id,
+        sender: currentUserData._id,
+        text: [
+          `Item name: ${items.item}`,
+          `Location: ${items.location}`,
+          `Current Item Status: Found Item ${items.foundItemStatus}`,
+        ].join("\n"),
+        image: items.foundItemsImages?.[0] || "",
+      });
 
-    // Set chat in Redux
-    dispatch(SetSelectedChat(chat));
+      // Set chat in Redux
+      dispatch(SetSelectedChat(chat));
 
-    // Navigate to chat page
-    router.push("/user-messages");
+      // Navigate to chat page
+      router.push("/user-messages");
+    } catch (err: any) {
+      message.error(err.message || "Something went wrong");
+    } finally {
+      setContacting(false); // Stop loader
+    }
   };
 
   if (items.foundItemStatus === "pending") {
@@ -138,8 +147,12 @@ const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
             {currentUserData?._id === items?.reportedBy._id ? (
               <div>This is your card</div>
             ) : (
-              <Button className="w-full" onClick={openChat}>
-                Contact
+              <Button
+                className="w-full"
+                onClick={openChat}
+                disabled={contacting}
+              >
+                {contacting ? "Contacting..." : "Contact"}
               </Button>
             )}
           </div>
@@ -223,8 +236,12 @@ const FoundItemCard = ({ items }: { items: FoundItemReportType }) => {
             {currentUserData?._id === items?.reportedBy._id ? (
               <div>This is your card</div>
             ) : (
-              <Button className="w-full" onClick={openChat}>
-                Contact
+              <Button
+                className="w-full"
+                onClick={openChat}
+                disabled={contacting}
+              >
+                {contacting ? "Contacting..." : "Contact"}
               </Button>
             )}
           </div>

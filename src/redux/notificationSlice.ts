@@ -38,6 +38,12 @@ const notificationSlice = createSlice({
       state.chatUnread[chatId].lastMessage = lastMessage;
       state.chatUnread[chatId].lastSenderName = lastSenderName;
     },
+    setUnread: (
+      state,
+      action: PayloadAction<NotificationState["chatUnread"]>
+    ) => {
+      state.chatUnread = action.payload;
+    },
     clearChatUnread: (state, action: PayloadAction<string>) => {
       delete state.chatUnread[action.payload];
     },
@@ -47,6 +53,6 @@ const notificationSlice = createSlice({
   },
 });
 
-export const { incrementUnread, clearChatUnread, clearAllUnread } =
+export const { incrementUnread, clearChatUnread, clearAllUnread, setUnread } =
   notificationSlice.actions;
 export default notificationSlice;

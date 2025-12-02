@@ -12,6 +12,7 @@ import { UploadImageToFireBaseAndReturnUrl } from "@/lib/image-upload";
 import { UpdateUserProfilePicture } from "@/server-actions/users";
 import { useDispatch } from "react-redux";
 import { setCurrentUserData } from "@/redux/userSlice";
+import { clearAllUnread } from "@/redux/notificationSlice";
 
 const CurrentUserInfo = ({
   currentUserData,
@@ -24,39 +25,48 @@ const CurrentUserInfo = ({
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { signOut } = useClerk();
-  const [loading, setLoading] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const getProperty = (key: string, value: string | Date) => {
-    return (
-      <div className="flex flex-col">
-        <span className="font-semibold text-gray-700">{key} </span>
-        <span className="text-gray-600">
-          {value instanceof Date ? value.toLocaleDateString() : value}
-        </span>
-      </div>
-    );
-  };
+  const getProperty = (key: string, value: string | Date) => (
+    <div className="flex flex-col">
+      <span className="font-semibold text-gray-700">{key} </span>
+      <span className="text-gray-600">
+        {value instanceof Date ? value.toLocaleDateString() : value}
+      </span>
+    </div>
+  );
 
   const onLogout = async () => {
     try {
-      setLoading(true);
+      setLogoutLoading(true);
+
+      // Clear unread counts before logging out
+      dispatch(clearAllUnread());
+
+      // Notify server that user is logging out
       socket.emit("logout", currentUserData?._id!);
+
+      // Clerk sign out
       await signOut();
+
       message.success("Logged out successfully");
       router.push("/sign-in");
     } catch (error: any) {
       message.error(error.message || "Something went wrong during logout");
     } finally {
-      setLoading(false);
+      setLogoutLoading(false);
     }
   };
 
   const onProfilePictureUpdate = async () => {
+    if (!selectedFile) return;
+
     try {
-      setLoading(true);
-      const profileURL = await UploadImageToFireBaseAndReturnUrl(selectedFile!);
+      setUpdateLoading(true);
+      const profileURL = await UploadImageToFireBaseAndReturnUrl(selectedFile);
       const response = await UpdateUserProfilePicture(currentUserData?._id, {
         profilePicture: profileURL,
       });
@@ -68,7 +78,7 @@ const CurrentUserInfo = ({
     } catch (error: any) {
       message.error(error.message);
     } finally {
-      setLoading(false);
+      setUpdateLoading(false);
       setSelectedFile(null);
     }
   };
@@ -95,9 +105,7 @@ const CurrentUserInfo = ({
             className="cursor-pointer"
             listType={selectedFile ? "picture-circle" : "text"}
             maxCount={1}
-            onRemove={() => {
-              setSelectedFile(null); // restore avatar
-            }}
+            onRemove={() => setSelectedFile(null)}
           >
             {selectedFile ? (
               "Click here to change"
@@ -106,6 +114,7 @@ const CurrentUserInfo = ({
             )}
           </Upload>
         </div>
+
         <div className="flex flex-col gap-5">
           {getProperty("Name", currentUserData.name)}
           {getProperty("Username", currentUserData.userName)}
@@ -115,13 +124,14 @@ const CurrentUserInfo = ({
             dayjs(currentUserData.createdAt).format("MMM, DD, YYYY hh:mm A")
           )}
         </div>
+
         <div>
           <Button
             className="w-full mt-5"
             block
             onClick={onProfilePictureUpdate}
             disabled={!selectedFile}
-            loading={loading}
+            loading={updateLoading}
           >
             Update Profile Picture
           </Button>
@@ -129,8 +139,8 @@ const CurrentUserInfo = ({
             className="w-full mt-5"
             block
             onClick={onLogout}
-            disabled={loading}
-            loading={loading && !selectedFile}
+            disabled={logoutLoading || updateLoading}
+            loading={logoutLoading}
           >
             Logout
           </Button>

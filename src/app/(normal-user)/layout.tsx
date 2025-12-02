@@ -1,23 +1,18 @@
-import Header from "@/components/header";
+import { ReactNode } from "react";
 import { ServerRoleGuard } from "@/lib/role-guard";
+import NormalUserClientLayout from "./_client-layout";
 
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
+export const metadata = {
   title: "Digital Lost and Found System",
   description: "A platform to report and find lost items digitally.",
 };
-export default async function UserLayout({
+
+export default async function NormalUserServerLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: ReactNode;
+}) {
   await ServerRoleGuard({ requiredRole: "user" });
 
-  return (
-    <div className="h-screen grid grid-rows-[auto_1fr]">
-      <Header />
-      <div>{children}</div>
-    </div>
-  );
+  return <NormalUserClientLayout>{children}</NormalUserClientLayout>;
 }

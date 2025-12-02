@@ -1,31 +1,37 @@
 import { Metadata } from "next";
 import Sidebar from "../_admin-components/admin-sidebar";
 import { ServerRoleGuard } from "@/lib/role-guard";
+import AdminClientListeners from "../_admin-components/admin-client-listeners";
 
 export const metadata: Metadata = {
   title: "ADMIN Digital Lost and Found System",
   description: "A platform to report and find lost items digitally.",
 };
+
 export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // ✅ Role guard to ensure only admin can access
   await ServerRoleGuard({ requiredRole: "admin" });
+
   return (
     <div className="h-screen grid lg:grid-cols-[auto_1fr] relative">
-      {/* Desktop sidebar (in the grid) */}
+      {/* Desktop sidebar */}
       <div className="hidden lg:block h-screen">
         <Sidebar />
       </div>
 
-      {/* Mobile sidebar (overlay) */}
+      {/* Mobile sidebar */}
       <div className="lg:hidden absolute top-0 left-0 h-screen bg-white z-50">
         <Sidebar />
       </div>
 
       {/* Main content */}
-      <div className="overflow-auto">{children}</div>
+      <div className="overflow-auto">
+        <AdminClientListeners>{children}</AdminClientListeners>
+      </div>
     </div>
   );
 }

@@ -22,7 +22,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NotificationState } from "@/redux/notificationSlice";
+import { clearAllUnread, NotificationState } from "@/redux/notificationSlice";
 
 const Sidebar = () => {
   const { currentUserData } = useSelector((state: any) => state.user);
@@ -56,8 +56,16 @@ const Sidebar = () => {
   const onLogout = async () => {
     try {
       setLoading(true);
+
+      // Clear unread counts before logging out
+      dispatch(clearAllUnread());
+
+      // Notify server that user is logging out
       socket.emit("logout", currentUserData?._id!);
+
+      // Clerk sign out
       await signOut();
+
       message.success("Logged out successfully");
       router.push("/sign-in");
     } catch (error: any) {

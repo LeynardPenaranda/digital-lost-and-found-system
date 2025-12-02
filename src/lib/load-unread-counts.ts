@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { UserState } from "@/redux/userSlice";
-import { incrementUnread } from "@/redux/notificationSlice";
+import { setUnread } from "@/redux/notificationSlice";
 import { GetUserUnreadCounts } from "@/server-actions/chats";
 
 export default function LoadUnreadCounts() {
@@ -18,19 +18,12 @@ export default function LoadUnreadCounts() {
     const fetchUnread = async () => {
       const unreadCounts = await GetUserUnreadCounts(currentUserData._id);
 
-      Object.entries(unreadCounts).forEach(([chatId, data]) => {
-        dispatch(
-          incrementUnread({
-            chatId,
-            lastMessage: data.lastMessage,
-            lastSenderName: data.lastSenderName,
-          })
-        );
-      });
+      // Directly set counts instead of incrementing
+      dispatch(setUnread(unreadCounts));
     };
 
     fetchUnread();
-  }, [currentUserData]);
+  }, [currentUserData?._id]); // only trigger when the user ID changes
 
   return null;
 }

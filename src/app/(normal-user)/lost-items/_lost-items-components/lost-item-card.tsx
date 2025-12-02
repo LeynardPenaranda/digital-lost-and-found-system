@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 const LostItemCard = ({ items }: { items: LostItemReportType }) => {
   const [showMore, setShowMore] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [contacting, setContacting] = useState(false);
   const descriptionTooLong = items.itemDescription.length > 155;
   const dispatch = useDispatch();
   const router = useRouter();
@@ -34,37 +35,40 @@ const LostItemCard = ({ items }: { items: LostItemReportType }) => {
     if (!currentUserData?._id) return;
 
     try {
-      setLoading(true); // show loader
+      setContacting(true); // Start loader
 
+      // Get or create chat
       const chat = await GetOrCreateChat(
         currentUserData._id,
         items.reportedBy._id
       );
 
       if (chat.error) {
-        setLoading(false);
-        return message.error(chat.error);
+        message.error(chat.error);
+        return;
       }
 
-      // Send initial message
+      // Auto-send item details message
       await SendMessage({
         chatId: chat._id,
         sender: currentUserData._id,
         text: [
           `Item name: ${items.item}`,
           `Location: ${items.location}`,
-          `Current Status: Lost ${items.lostItemStatus}`,
+          `Current Item Status: Lost Item ${items.lostItemStatus}`,
         ].join("\n"),
         image: items.lostItemsImages?.[0] || "",
       });
 
+      // Set chat in Redux
       dispatch(SetSelectedChat(chat));
 
       // Navigate to chat page
       router.push("/user-messages");
+    } catch (err: any) {
+      message.error(err.message || "Something went wrong");
     } finally {
-      // Let Next.js finish navigation then hide loader
-      setTimeout(() => setLoading(false), 300);
+      setContacting(false); // Stop loader
     }
   };
 

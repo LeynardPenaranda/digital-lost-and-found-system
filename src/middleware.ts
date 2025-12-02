@@ -1,8 +1,6 @@
-// middleware.ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Routes that require authentication
 const protectedRoute = createRouteMatcher([
   "/",
   "/admin/:path*",
@@ -15,16 +13,17 @@ const protectedRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
+  const pathname = req.nextUrl.pathname;
 
-  // Skip sign-in & sign-up pages
-  if (
-    req.nextUrl.pathname.startsWith("/sign-in") ||
-    req.nextUrl.pathname.startsWith("/sign-up")
-  ) {
+  // Pages to skip auth
+  const skipPages = ["/sign-in", "/sign-up", "/sign-in/factor-one"];
+  const skipClerkInternal = pathname.includes("SignIn_clerk_catchall_check");
+
+  if (skipPages.some((p) => pathname.startsWith(p)) || skipClerkInternal) {
     return NextResponse.next();
   }
 
-  // Redirect if user is not logged in
+  // Only redirect if accessing protected route AND user is not logged in
   if (protectedRoute(req) && !userId) {
     const signInUrl = new URL("/sign-in", req.url);
     signInUrl.searchParams.set("redirect_url", req.url);
@@ -44,5 +43,5 @@ export const config = {
     "/found-items/:path*",
     "/report-items/:path*",
     "/banned-users/:path*",
-  ], // middleware only applies to these
+  ],
 };
