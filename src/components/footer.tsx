@@ -1,4 +1,5 @@
 import { Button } from "antd";
+import { Facebook, Github, Instagram, Linkedin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -54,19 +55,19 @@ const arrayLinkSocial = [
 ];
 const arrayLinkSocialIcon = [
   {
-    icon: <i className="ri-linkedin-box-fill"></i>,
+    icon: <Linkedin size={14} />,
     href: "#",
   },
   {
-    icon: <i className="ri-facebook-circle-fill"></i>,
+    icon: <Facebook size={14} />,
     href: "#",
   },
   {
-    icon: <i className="ri-github-fill"></i>,
+    icon: <Github size={14} />,
     href: "#",
   },
   {
-    icon: <i className="ri-instagram-line"></i>,
+    icon: <Instagram size={14} />,
     href: "#",
   },
 ];

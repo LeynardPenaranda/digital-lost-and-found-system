@@ -19,7 +19,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex items-center justify-center h-[25rem]">
+          <div className="flex items-center justify-center h-full">
             <div className="flex flex-col gap-2 w-[30%] ">
               <Button asChild>
                 <Link href="/lost-items">Lost</Link>
@@ -28,7 +28,6 @@ export default function Home() {
                 <Link href="/found-items">Found</Link>
               </Button>
             </div>
-            <div></div>
           </div>
         </div>
         <div>

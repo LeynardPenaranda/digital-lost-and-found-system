@@ -57,13 +57,8 @@ const Sidebar = () => {
     try {
       setLoading(true);
 
-      // Clear unread counts before logging out
       dispatch(clearAllUnread());
-
-      // Notify server that user is logging out
       socket.emit("logout", currentUserData?._id!);
-
-      // Clerk sign out
       await signOut();
 
       message.success("Logged out successfully");
@@ -88,11 +83,52 @@ const Sidebar = () => {
     }
   }, [currentUserData]);
 
-  // Calculate total unread messages
   const totalUnread = Object.values(chatUnread).reduce(
     (acc, curr) => acc + (curr.count || 0),
     0
   );
+
+  // Sidebar links
+  const links = [
+    { name: "Dashboard", href: "/admin", icon: <LayoutDashboard /> },
+    { name: "User", href: "/admin/admin-user-list", icon: <User /> },
+    { name: "Status", href: "/admin/admin-status", icon: <Ticket /> },
+    {
+      name: "Messages",
+      href: "/admin/admin-messages",
+      icon: <MessageCircle />,
+      badge: totalUnread,
+    },
+  ];
+
+  const handleLinkClick = (href: string, e: React.MouseEvent) => {
+    if (pathname === href) {
+      e.preventDefault();
+      message.info(`You are already on ${href.split("/").pop()}`);
+      return;
+    }
+    setLoading(true);
+  };
+
+  const renderLinks = () =>
+    links.map((link) => (
+      <Link
+        key={link.href}
+        href={link.href}
+        onClick={(e) => handleLinkClick(link.href, e)}
+        className={`flex gap-8 items-center px-2 py-1 ${
+          pathname === link.href ? "border-b-2 border-blue-500" : ""
+        } text-gray-500 relative`}
+      >
+        {link.icon}
+        {isOpen && <span className="text-gray-500">{link.name}</span>}
+        {link.badge && link.badge > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
+            {link.badge}
+          </span>
+        )}
+      </Link>
+    ));
 
   return (
     <>
@@ -105,77 +141,18 @@ const Sidebar = () => {
         </div>
       )}
 
+      {/* Desktop Sidebar */}
       <div
         className={`border border-l border-gray-300 p-4 hidden lg:flex flex-col gap-10 items-center relative h-full ${
           isOpen ? "w-[17rem]" : "w-16"
         } transition-width duration-300`}
       >
-        {/* Logo */}
         <div>
           <Image src="/DLFS-logos.png" alt="Logo" width={90} height={90} />
         </div>
 
-        {/* Navigation */}
-        <div className="flex flex-col gap-6 mt-20">
-          <Link
-            href="/admin"
-            onClick={() => setLoading(true)}
-            className={`flex gap-8 items-center px-2 py-1 ${
-              pathname === "/admin" ? "border-b-2 border-blue-500" : ""
-            }`}
-          >
-            <LayoutDashboard className="text-gray-500" />
-            {isOpen && <span className="text-gray-500">Dashboard</span>}
-          </Link>
+        <div className="flex flex-col gap-6 mt-20">{renderLinks()}</div>
 
-          <Link
-            href="/admin/admin-user-list"
-            onClick={() => setLoading(true)}
-            className={`flex gap-8 items-center px-2 py-1 ${
-              pathname === "/admin/admin-user-list"
-                ? "border-b-2 border-blue-500"
-                : ""
-            }`}
-          >
-            <User className="text-gray-500" />
-            {isOpen && <span className="text-gray-500">User</span>}
-          </Link>
-
-          <Link
-            href="/admin/admin-status"
-            onClick={() => setLoading(true)}
-            className={`flex gap-8 items-center px-2 py-1 ${
-              pathname === "/admin/admin-status"
-                ? "border-b-2 border-blue-500"
-                : ""
-            }`}
-          >
-            <Ticket className="text-gray-500" />
-            {isOpen && <span className="text-gray-500">Status</span>}
-          </Link>
-
-          <Link
-            href="/admin/admin-messages"
-            onClick={() => setLoading(true)}
-            className={`flex gap-8 items-center relative px-2 py-1 ${
-              pathname === "/admin/admin-messages"
-                ? "border-b-2 border-blue-500"
-                : ""
-            }`}
-          >
-            <MessageCircle className="text-gray-500" />
-            {isOpen && <span className="text-gray-500">Messages</span>}
-
-            {/* Unread badge */}
-            {totalUnread > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
-                {totalUnread}
-              </span>
-            )}
-          </Link>
-        </div>
-
-        {/* Collapse Button */}
         <div className="absolute cursor-pointer right-0 bottom-[27rem]">
           {isOpen ? (
             <ChevronsLeft onClick={() => setIsOpen(!isOpen)} />
@@ -225,74 +202,18 @@ const Sidebar = () => {
         </div>
       </div>
 
+      {/* Mobile Sidebar */}
       <div
-        className={`border border-l border-gray-300 p-4 lg:hidden  flex-col gap-10 items-center relative h-full
-    transition-all duration-300 ease-in-out
-    ${isOpen ? "w-16 flex" : "hidden pointer-events-none"}
-  `}
+        className={`border border-l border-gray-300 p-4 lg:hidden flex-col gap-10 items-center relative h-full
+      transition-all duration-300 ease-in-out
+      ${isOpen ? "w-16 flex" : "hidden pointer-events-none"}`}
       >
-        {/* Logo */}
         <div>
           <Image src="/DLFS-logos.png" alt="Logo" width={90} height={90} />
         </div>
 
-        {/* Navigation */}
-        <div className="flex flex-col gap-6 mt-20">
-          <Link
-            href="/admin"
-            onClick={() => setLoading(true)}
-            className={`flex gap-8 items-center px-2 py-1 ${
-              pathname === "/admin" ? "border-b-2 border-blue-500" : ""
-            }`}
-          >
-            {isOpen && <LayoutDashboard className="text-gray-500" />}
-          </Link>
+        <div className="flex flex-col gap-6 mt-20">{renderLinks()}</div>
 
-          <Link
-            href="/admin/admin-user-list"
-            onClick={() => setLoading(true)}
-            className={`flex gap-8 items-center px-2 py-1 ${
-              pathname === "/admin/admin-user-list"
-                ? "border-b-2 border-blue-500"
-                : ""
-            }`}
-          >
-            {isOpen && <User className="text-gray-500" />}
-          </Link>
-
-          <Link
-            href="/admin/admin-status"
-            onClick={() => setLoading(true)}
-            className={`flex gap-8 items-center px-2 py-1 ${
-              pathname === "/admin/admin-status"
-                ? "border-b-2 border-blue-500"
-                : ""
-            }`}
-          >
-            {isOpen && <Ticket className="text-gray-500" />}
-          </Link>
-
-          <Link
-            href="/admin/admin-messages"
-            onClick={() => setLoading(true)}
-            className={`flex gap-8 items-center relative px-2 py-1 ${
-              pathname === "/admin/admin-messages"
-                ? "border-b-2 border-blue-500"
-                : ""
-            }`}
-          >
-            {isOpen && <MessageCircle className="text-gray-500" />}
-
-            {/* Unread badge */}
-            {totalUnread > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
-                {totalUnread}
-              </span>
-            )}
-          </Link>
-        </div>
-
-        {/* User Info & Logout */}
         <div className="absolute bottom-5 flex items-center gap-2">
           {isOpen && currentUserData?.profilePicture && (
             <Avatar
@@ -313,7 +234,8 @@ const Sidebar = () => {
           )}
         </div>
       </div>
-      {/* Collapse Button */}
+
+      {/* Mobile Collapse Button */}
       <div className="absolute cursor-pointer left-2 bottom-[25rem] z-20 lg:hidden bg-gray-500/20 p-2 rounded-sm">
         <div
           onClick={() => setIsOpen(!isOpen)}

@@ -1,16 +1,35 @@
 "use client";
 
 import { NotificationState } from "@/redux/notificationSlice";
+import {
+  BadgeX,
+  FileText,
+  House,
+  MessageCircle,
+  SearchCheck,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 const navlinks = [
-  { name: "Home", href: "/" },
-  { name: "Lost items", href: "/lost-items" },
-  { name: "Found items", href: "/found-items" },
-  { name: "Messages", href: "/user-messages" },
-  { name: "Reported Items", href: "/report-items" },
+  { icon: <House size={20} />, name: "Home", href: "/" },
+  { icon: <BadgeX size={20} />, name: "Lost items", href: "/lost-items" },
+  {
+    icon: <SearchCheck size={20} />,
+    name: "Found items",
+    href: "/found-items",
+  },
+  {
+    icon: <MessageCircle size={20} />,
+    name: "Messages",
+    href: "/user-messages",
+  },
+  {
+    icon: <FileText size={20} />,
+    name: "Reported Items",
+    href: "/report-items",
+  },
 ];
 
 const NavLinks = ({ className }: { className?: string }) => {
@@ -55,12 +74,25 @@ const NavLinks = ({ className }: { className?: string }) => {
           {navlinks.map((link) => {
             const isActive = pathname === link.href;
             return (
-              <li key={link.name} className="relative">
+              <li
+                key={link.href}
+                className="relative flex items-center justify-center gap-1"
+              >
+                <span>{link.icon}</span>
                 <button
                   onClick={() => handleNavigate(link.href)}
-                  className={`${isActive ? "border-b-2 border-blue-900" : ""}`}
+                  className="flex items-center justify-center gap-2 relative  py-1"
                 >
-                  {link.name}
+                  <span>{link.name}</span>
+
+                  {/* Animated underline */}
+                  <span
+                    className={`
+        absolute bottom-0 left-0 h-0.5 bg-blue-900
+        transition-all duration-300 ease-in-out
+        ${isActive ? "w-full" : "w-0"}
+      `}
+                  />
                 </button>
 
                 {/* Show unread badge only for Messages link */}

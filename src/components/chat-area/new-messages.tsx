@@ -1,5 +1,5 @@
 import { Button, message } from "antd";
-import { Image, SendHorizontal, X } from "lucide-react";
+import { Image, SendHorizontal, SmilePlus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { UserState } from "@/redux/userSlice";
@@ -104,11 +104,7 @@ const NewMessages = () => {
           onClick={() => setShowEmoji(!showEmoji)}
           type={showEmoji ? "primary" : "default"}
         >
-          {showEmoji ? (
-            <X size={14} />
-          ) : (
-            <i className="ri-emoji-sticker-line"></i>
-          )}
+          {showEmoji ? <X size={14} /> : <SmilePlus size={14} />}
         </Button>
         <Button onClick={() => setShowImageSelector(!showImageSelector)}>
           <Image size={14} />
