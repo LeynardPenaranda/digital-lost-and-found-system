@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { message, Spin } from "antd";
 import { LostItemReportType } from "@/interfaces";
 import { getAllLostItems } from "@/server-actions/lost-items-report";
@@ -9,8 +9,12 @@ import LostItemCard from "./lost-item-card";
 import socket from "@/config/socket-config";
 
 const LostItemsContent = () => {
-  const searchParams = useSearchParams();
-  const searchQuery = searchParams.get("q") || "";
+  const rawSearchParams = useSearchParams();
+
+  // Memoize search query so it won't trigger fetch endlessly
+  const searchQuery = useMemo(() => {
+    return rawSearchParams.get("q") || "";
+  }, [rawSearchParams]);
 
   const [lostItems, setLostItems] = useState<LostItemReportType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -32,7 +36,7 @@ const LostItemsContent = () => {
 
       // Filter out items where the reporter was deleted
       const transformed = dataArray
-        .filter((item) => item.reportedBy) // remove deleted users
+        .filter((item) => item.reportedBy)
         .map((item: LostItemReportType) => {
           const fullName = item.reportedBy?.name || "Unknown";
           const isAdmin = item.reportedBy?.role === "admin";
@@ -59,20 +63,27 @@ const LostItemsContent = () => {
     }
   };
 
+  // Re-fetch when search query OR tab changes
   useEffect(() => {
-    fetchLostItems();
+    const timeout = setTimeout(() => {
+      fetchLostItems();
+    }, 300);
+
+    return () => clearTimeout(timeout);
   }, [searchQuery, statusFilter]);
 
+  // Socket listener (stable + cleaned properly)
   useEffect(() => {
-    socket.on("lost-item-created", (newReport) => {
-      // Only add if matches current tab and has a valid reporter
+    const handleNewReport = (newReport: LostItemReportType) => {
       if (newReport.lostItemStatus === statusFilter && newReport.reportedBy) {
         setLostItems((prev) => [newReport, ...prev]);
       }
-    });
+    };
+
+    socket.on("lost-item-created", handleNewReport);
 
     return () => {
-      socket.off("lost-item-created");
+      socket.off("lost-item-created", handleNewReport);
     };
   }, [statusFilter]);
 
@@ -104,11 +115,13 @@ const LostItemsContent = () => {
       {/* CONTENT SECTION */}
       <div className="w-full h-[40rem] overflow-y-auto mt-5">
         {loading && <Spin size="large" className="my-10 flex justify-center" />}
+
         {!loading && lostItems.length === 0 && (
           <span className="text-[2rem] text-gray-400 font-semibold my-10 flex justify-center">
             No {statusFilter} lost items...
           </span>
         )}
+
         {!loading && lostItems.length > 0 && (
           <div className="flex gap-10 flex-wrap justify-center">
             {lostItems.map((items) => (

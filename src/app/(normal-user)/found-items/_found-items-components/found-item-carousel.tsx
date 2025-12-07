@@ -25,8 +25,8 @@ const FoundItemCarousel = ({ item }: { item: FoundItemReportType }) => {
         arrows={false}
         className="h-full"
       >
-        {images.map((src, index) => (
-          <div key={index} className="relative w-full h-40">
+        {images.map((src) => (
+          <div key={src} className="relative w-full h-40">
             {/* Found Overlay */}
             {item.foundItemStatus === "claimed" && (
               <div className="absolute inset-0 z-20 flex items-center justify-center">
@@ -39,7 +39,7 @@ const FoundItemCarousel = ({ item }: { item: FoundItemReportType }) => {
 
             <Image
               src={src}
-              alt={`Lost item ${index}`}
+              alt={`Lost item ${src}`}
               fill
               style={{ objectFit: "contain" }}
             />

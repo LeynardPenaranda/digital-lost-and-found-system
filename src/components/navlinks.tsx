@@ -29,6 +29,8 @@ const NavLinks = ({ className }: { className?: string }) => {
   );
 
   const handleNavigate = (href: string) => {
+    if (href === pathname) return; // ⛔ prevent unnecessary navigation
+
     setLoading(true);
     router.push(href);
   };

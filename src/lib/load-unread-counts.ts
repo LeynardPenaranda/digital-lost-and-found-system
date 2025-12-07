@@ -15,15 +15,18 @@ export default function LoadUnreadCounts() {
   useEffect(() => {
     if (!currentUserData?._id) return;
 
-    const fetchUnread = async () => {
-      const unreadCounts = await GetUserUnreadCounts(currentUserData._id);
+    console.log(currentUserData?._id);
 
+    const fetchUnread = async () => {
+      console.log("Inside the fetch:", currentUserData?._id);
+      const unreadCounts = await GetUserUnreadCounts(currentUserData?._id);
+      console.log("Unread response:", unreadCounts);
       // Directly set counts instead of incrementing
       dispatch(setUnread(unreadCounts));
     };
 
     fetchUnread();
-  }, [currentUserData?._id]); // only trigger when the user ID changes
+  }, [currentUserData?._id, dispatch]); // only trigger when the user ID changes
 
   return null;
 }
