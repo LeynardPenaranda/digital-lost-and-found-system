@@ -127,11 +127,13 @@ const Sidebar = () => {
           </span>
         )}
 
-        {link.badge && link.badge > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
-            {link.badge}
-          </span>
-        )}
+        {(link.badge ?? 0) > 0 && (
+  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
+    {link.badge}
+  </span>
+)}
+
+
       </Link>
 
     ));
