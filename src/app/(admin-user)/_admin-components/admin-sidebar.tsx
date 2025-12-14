@@ -116,18 +116,24 @@ const Sidebar = () => {
         key={link.href}
         href={link.href}
         onClick={(e) => handleLinkClick(link.href, e)}
-        className={`flex gap-8 items-center px-2 py-1 ${
-          pathname === link.href ? "border-b-2 border-blue-500" : ""
-        } text-gray-500 relative`}
+        className={`flex items-center gap-2 md:gap-8 px-2 py-1 ${pathname === link.href ? "border-b-2 border-blue-500" : ""
+          } text-gray-500 relative`}
       >
         {link.icon}
-        {isOpen && <span className="text-gray-500">{link.name}</span>}
+
+        {isOpen && (
+          <span className="hidden md:inline text-gray-500 whitespace-nowrap">
+            {link.name}
+          </span>
+        )}
+
         {link.badge && link.badge > 0 && (
           <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 pointer-events-none">
             {link.badge}
           </span>
         )}
       </Link>
+
     ));
 
   return (
@@ -143,9 +149,8 @@ const Sidebar = () => {
 
       {/* Desktop Sidebar */}
       <div
-        className={`border border-l border-gray-300 p-4 hidden lg:flex flex-col gap-10 items-center relative h-full ${
-          isOpen ? "w-[17rem]" : "w-16"
-        } transition-width duration-300`}
+        className={`border border-l border-gray-300 p-4 hidden lg:flex flex-col gap-10 items-center relative h-full ${isOpen ? "w-[17rem]" : "w-16"
+          } transition-width duration-300`}
       >
         <div>
           <Image src="/DLFS-logos.png" alt="Logo" width={90} height={90} />
@@ -239,9 +244,8 @@ const Sidebar = () => {
       <div className="absolute cursor-pointer left-2 bottom-[25rem] z-20 lg:hidden bg-gray-500/20 p-2 rounded-sm">
         <div
           onClick={() => setIsOpen(!isOpen)}
-          className={`transition-transform duration-300 ${
-            isOpen ? "rotate-180" : "rotate-0"
-          }`}
+          className={`transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"
+            }`}
         >
           {isOpen ? <ChevronsLeft /> : <ChevronsRight />}
         </div>
