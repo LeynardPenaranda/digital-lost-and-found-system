@@ -1,18 +1,12 @@
 import Image from "next/image";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { UserState } from "@/redux/userSlice";
-import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
 
-const TempHeader = ({ currentUserData }: { currentUserData?: any }) => {
-  const router = useRouter();
 
-  const handleGoBack = () => {
-    if (!currentUserData) return;
-    if (currentUserData.role === "admin") router.push("/admin");
-    else router.push("/home");
-  };
+const TempHeader = () => {
+
+
+
 
   return (
     <header className="border h-[5rem] flex items-center justify-between bg-gray-100 sticky top-0 z-50">
@@ -25,17 +19,11 @@ const TempHeader = ({ currentUserData }: { currentUserData?: any }) => {
         </span>
       </div>
 
-      {currentUserData ? (
-        <Button onClick={handleGoBack} className="lg:mr-20">
-          You are logged in. Click here to go back
-        </Button>
-      ) : (
-        <Button asChild>
+      <Button asChild>
           <Link href="/sign-in" className="lg:mr-20">
             Sign In
           </Link>
         </Button>
-      )}
     </header>
   );
 };

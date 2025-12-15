@@ -9,7 +9,17 @@ export const metadata = {
 };
 
 export default async function NormalUserServerLayout({ children }: { children: React.ReactNode }) {
-  const guardResult = await ServerRoleGuard({ requiredRole: "user" });
+   // ✅ Get guard result (DON'T ignore it)
+    const guardResult = await ServerRoleGuard({ requiredRole: "user" });
+  
+    // ⛔ BLOCK admin UI completely if redirect is needed
+    if (guardResult.redirectTo) {
+      return (
+        <RoleGuardWrapper guardResult={guardResult}>
+          {/* Nothing here on purpose */}
+        </RoleGuardWrapper>
+      );
+    }
 
   return (
     <RoleGuardWrapper guardResult={guardResult}>
