@@ -64,13 +64,11 @@ const LostItemsContent = () => {
   };
 
   // Re-fetch when search query OR tab changes
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchLostItems();
-    }, 300);
+ useEffect(() => {
+  fetchLostItems();
+}, [searchQuery, statusFilter]);
 
-    return () => clearTimeout(timeout);
-  }, [searchQuery, statusFilter]);
+
 
   // Socket listener (stable + cleaned properly)
   useEffect(() => {
