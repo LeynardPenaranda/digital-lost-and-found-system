@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 const navlinks = [
-  { icon: <House size={20} />, name: "Home", href: "/" },
+  { icon: <House size={20} />, name: "Home", href: "/home" },
   { icon: <BadgeX size={20} />, name: "Lost items", href: "/lost-items" },
   {
     icon: <SearchCheck size={20} />,

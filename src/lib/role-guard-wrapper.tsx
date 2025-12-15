@@ -34,7 +34,7 @@ export default function RoleGuardWrapper({
 
   if (redirecting) {
     return (
-      <div className="flex gap-2 items-center justify-center h-screen text-xl font-medium">
+      <div className="flex gap-2 items-center justify-center h-screen text-xl font-medium text-center">
         <Loader className="animate-spin"/>
         {guardResult.message || "Redirecting..."}
       </div>
