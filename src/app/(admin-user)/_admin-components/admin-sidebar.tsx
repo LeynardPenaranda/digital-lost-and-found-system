@@ -122,7 +122,7 @@ const Sidebar = () => {
         {link.icon}
 
         {isOpen && (
-          <span className="hidden md:inline text-gray-500 whitespace-nowrap">
+          <span className="hidden lg:inline text-gray-500 whitespace-nowrap">
             {link.name}
           </span>
         )}

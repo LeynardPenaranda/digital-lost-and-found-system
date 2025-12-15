@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import Sidebar from "../_admin-components/admin-sidebar";
 import { ServerRoleGuard } from "@/lib/role-guard";
 import AdminClientListeners from "../_admin-components/admin-client-listeners";
+import RoleGuardWrapper from "@/lib/role-guard-wrapper";
+
 
 export const metadata: Metadata = {
   title: "ADMIN Digital Lost and Found System",
@@ -10,12 +12,22 @@ export const metadata: Metadata = {
 
 export default async function AdminLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  // ✅ Role guard to ensure only admin can access
-  await ServerRoleGuard({ requiredRole: "admin" });
+}) {
+  // ✅ Get guard result (DON'T ignore it)
+  const guardResult = await ServerRoleGuard({ requiredRole: "admin" });
 
+  // ⛔ BLOCK admin UI completely if redirect is needed
+  if (guardResult.redirectTo) {
+    return (
+      <RoleGuardWrapper guardResult={guardResult}>
+        {/* Nothing here on purpose */}
+      </RoleGuardWrapper>
+    );
+  }
+
+  // ✅ Allowed → render admin UI
   return (
     <div className="h-screen grid lg:grid-cols-[auto_1fr] relative">
       {/* Desktop sidebar */}

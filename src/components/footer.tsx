@@ -84,15 +84,15 @@ const Footer = () => {
 
         <div className="flex flex-col items-start justify-center gap-2 px-5">
           <span className="text-lg font-semibold">Site</span>
-          {arrayLinkPage.map((link) => {
-            return <Link href={link.href}>{link.name}</Link>;
+          {arrayLinkPage.map((link, index) => {
+            return <Link href={link.href} key={index}>{link.name}</Link>;
           })}
         </div>
 
         <div className="flex flex-col items-start justify-center gap-2 px-5">
           <span className="text-lg font-semibold">Help</span>
-          {arrayLinkHelp.map((link) => {
-            return <Link href={link.href}>{link.name}</Link>;
+          {arrayLinkHelp.map((link, index) => {
+            return <Link href={link.href} key={index}>{link.name}</Link>;
           })}
         </div>
 
@@ -105,8 +105,8 @@ const Footer = () => {
 
         <div className="flex flex-col items-start justify-center gap-2 px-5">
           <span className="text-lg font-semibold">Social Links</span>
-          {arrayLinkSocial.map((link) => {
-            return <Link href={link.href}>{link.name}</Link>;
+          {arrayLinkSocial.map((link, index) => {
+            return <Link href={link.href} key={index}>{link.name}</Link>;
           })}
         </div>
 
@@ -116,9 +116,9 @@ const Footer = () => {
           <span>Email: DigitalLostandFoundSSU@gmail.com</span>
 
           <div className="flex gap-2 ">
-            {arrayLinkSocialIcon.map((link) => {
+            {arrayLinkSocialIcon.map((link, index) => {
               return (
-                <Link href={link.href}>
+                <Link href={link.href} key={index}>
                   <Button>{link.icon}</Button>
                 </Link>
               );

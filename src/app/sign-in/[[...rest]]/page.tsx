@@ -1,14 +1,21 @@
 "use client";
 
 import MarqueSlider from "@/components/marque-slider";
+import { Button } from "@/components/ui/button";
 import { SignIn } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
   return (
     <div className="grid grid-rows-2 lg:grid-rows-none lg:grid-cols-2 h-screen">
       {/* FIRST ROW — image with hidden overflow */}
       <div className="bg-blue-950 flex items-center justify-center overflow-hidden relative">
+        <div className="absolute top-2 left-2">
+          <Button asChild>
+              <Link href="/">Go Back</Link>
+          </Button>
+        </div>
         <div className="relative w-[80%] sm:w-[60%] lg:w-[70%] xl:w-[60%] max-w-[550px] mx-auto">
           {/* Main Image */}
           <div className="relative w-full aspect-square">
@@ -52,7 +59,11 @@ export default function Page() {
 
           {/* SignIn card */}
           <div className="relative z-50">
-            <SignIn />
+            <SignIn
+              path="/sign-in"
+              routing="path"
+            />
+
           </div>
 
           {/* Optional blur below SignIn (only needed on mobile) */}

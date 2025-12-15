@@ -1,17 +1,43 @@
 import { GetCurrentUserFromMongoDB } from "@/server-actions/users";
-import { redirect } from "next/navigation";
 
 interface Props {
   requiredRole: "admin" | "user";
 }
 
-export const ServerRoleGuard = async ({ requiredRole }: Props) => {
-  const user = await GetCurrentUserFromMongoDB(); // server-side fetch
+export interface GuardResult {
+  redirectTo: string | null;
+  message?: string;
+}
 
-  if (user.role !== requiredRole) {
-    redirect(user.role === "admin" ? "/admin" : "/");
-    return null;
+export const ServerRoleGuard = async ({
+  requiredRole,
+}: Props): Promise<GuardResult> => {
+  const user = await GetCurrentUserFromMongoDB();
+
+  if (!user) {
+    return {
+      redirectTo: "/sign-in",
+      message: "Please sign in first.",
+    };
   }
 
-  return null; // just a guard, no UI
+  if (!user.role || !["admin", "user"].includes(user.role)) {
+    return {
+      redirectTo: "/",
+      message: "Invalid account role.",
+    };
+  }
+
+  if (user.role !== requiredRole) {
+    const redirectPath = user.role === "admin" ? "/admin" : "/home";
+    const roleName = user.role === "admin" ? "admin" : "normal user";
+
+    return {
+      redirectTo: redirectPath,
+      message: `You are being redirected to ${roleName} page.`,
+    };
+  }
+
+  // Correct role, allow access
+  return { redirectTo: null };
 };

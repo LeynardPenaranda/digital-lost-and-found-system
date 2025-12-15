@@ -2,13 +2,13 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const protectedRoute = createRouteMatcher([
-  "/",
   "/admin/:path*",
   "/user-messages/:path*",
   "/lost-items/:path*",
   "/found-items/:path*",
   "/report-items/:path*",
   "/banned-users/:path*",
+  "/home/:path*",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -16,7 +16,8 @@ export default clerkMiddleware(async (auth, req) => {
   const pathname = req.nextUrl.pathname;
 
   // Pages to skip auth
-  const skipPages = ["/sign-in", "/sign-up", "/sign-in/factor-one"];
+  const skipPages = ["/sign-in", "/sign-up", "/sign-in/factor-one", "/sign-in/redirect"];
+
   const skipClerkInternal = pathname.includes("SignIn_clerk_catchall_check");
 
   if (skipPages.some((p) => pathname.startsWith(p)) || skipClerkInternal) {
@@ -35,7 +36,6 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    "/",
     "/profile/:path*",
     "/admin/:path*",
     "/user-messages/:path*",
@@ -43,5 +43,6 @@ export const config = {
     "/found-items/:path*",
     "/report-items/:path*",
     "/banned-users/:path*",
+    "/home/:path*",
   ],
 };

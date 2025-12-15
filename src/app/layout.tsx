@@ -15,7 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInForceRedirectUrl={process.env.CLERK_SIGN_IN_FORCE_REDIRECT_URL}
+      signInFallbackRedirectUrl={process.env.CLERK_SIGN_IN_FALLBACK_REDIRECT_URL}
+      signUpForceRedirectUrl={process.env.CLERK_SIGN_UP_FORCE_REDIRECT_URL}
+      signUpFallbackRedirectUrl={process.env.CLERK_SIGN_UP_FALLBACK_REDIRECT_URL}
+    >
       <html lang="en">
         <body>
           <ReduxProvider>
